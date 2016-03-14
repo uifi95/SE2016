@@ -10,7 +10,7 @@ class Student(models.Model):
     first_name = models.CharField(max_length=40)
     id_number = models.IntegerField("Identification number")
     email = models.EmailField()
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True)
     temp_pass = models.CharField(max_length=40)
     is_activated = models.BooleanField("Active", default=False)
 
@@ -40,8 +40,6 @@ class Student(models.Model):
 
     def delete(self, using=None, keep_parents=False):
         user = self.user
-        self.user = None
-        self.save()
         user.delete()
         super(Student, self).delete(using=using, keep_parents=keep_parents)
 

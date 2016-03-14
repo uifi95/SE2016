@@ -1,10 +1,12 @@
 # Create your views here.
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
-from .models import Student
+
 import os
+
+
 def main_page(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect("/login/")
@@ -13,6 +15,7 @@ def main_page(request):
         return HttpResponseRedirect(reverse('admin:index'))
 
     return HttpResponse("Welcome to home page")
+
 
 def activate_account(request):
     if not request.user.is_authenticated():
@@ -43,7 +46,6 @@ def activate_account(request):
 def login_user(request):
     auth_page = os.path.join("LoginApp", "auth.html")
     state = "Please log in below..."
-    username = password = ''
     if request.user.is_authenticated():
         return HttpResponse("You are already authenticated!")
     if request.POST:
