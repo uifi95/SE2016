@@ -1,0 +1,10 @@
+I propose the project be separated into 3 different apps:
+* LoginApp - managing the user login
+* StudentApp - managing the students view of the application
+* TeacherApp - managing the teachers view of the app
+
+The main entities the model should contain in the beginning:
+Student, Teacher, Staff, Course - defined in LoginApp
+Grade - defined in TeacherApp
+
+In time, as more features are to be developed, more models will be needed.

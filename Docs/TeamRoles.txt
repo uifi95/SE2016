@@ -1,0 +1,11 @@
+Each member of the team will contribute to all aspects of the project,
+however, a lax team role proposal will be presented below:
+
+Backend developers:
+Radu, Sergiu, Vlad
+
+Frontend developers:
+Melisa, Laura, Serghei
+
+In reality the team will be more flexible, everyone contributing where is needed. Moreover, each person will
+have specific tasks to perform, tasks not necessarily in tune with the separation outlined above.
