@@ -15,7 +15,6 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-
 from django.contrib.auth.models import User, Group
 
 # Register your models here.
@@ -25,5 +24,6 @@ admin.site.unregister(Group)
 admin.AdminSite.site_title = "Academic Admin"
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^student/', include('StudentApp.urls')),
     url(r'^', include('LoginApp.urls'))
 ]

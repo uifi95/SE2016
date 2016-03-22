@@ -1,9 +1,9 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.shortcuts import render, redirect
 from django.contrib import admin
 
 # Create your views here.
-from LoginApp.forms import LoginForm
+from LoginApp.forms import LoginForm, CustomizeAccountForm
 from django.forms import ValidationError
 
 def main_page(request):
@@ -13,6 +13,8 @@ def main_page(request):
     if request.user.is_staff:
         return redirect('admin:index')
 
+    if request.user.groups.filter(name="student").count():
+        return redirect('StudentApp:main')
 
 def login_page(request):
     if request.user.is_authenticated():
@@ -33,3 +35,28 @@ def login_page(request):
         return redirect("LoginApp:main")
     else:
          return render(request, "LoginApp/login.html", {'form': authForm})
+
+
+def logout_page(request):
+    logout(request)
+    return render(request, "LoginApp/logout.html", {"title" : "Logged out!"})
+
+
+def change_account(request):
+    if request.method != 'POST':
+        newForm = CustomizeAccountForm(user=request.user)
+        newForm.fields["username"].initial = request.user.username;
+        return render(request, "LoginApp/change_account.html", {'form':newForm})
+
+    form = CustomizeAccountForm(user=request.user, data=request.POST)
+    if form.is_valid():
+        form.save()
+        update_session_auth_hash(request, form.user)
+        if form.user.student_set.count() and not form.user.student_set.first().is_activated:
+            # Maybe change with a parent model for all types of entities?
+            obj = form.user.student_set.first()
+            obj.is_activated = True
+            obj.save()
+        return render(request, "LoginApp/done_change_account.html", {'title': "Account updated!"})
+    else:
+        return render(request, "LoginApp/change_account.html", {'form':form})

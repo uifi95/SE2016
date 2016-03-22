@@ -1,0 +1,12 @@
+{% extends "LoginApp/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'LoginApp:main' %}">{% trans 'Home' %}</a></div>{% endblock %}
+
+{% block content %}
+
+<p>{% trans "May the force be with you!" %}</p>
+
+<p><a href="{% url 'LoginApp:login' %}">{% trans 'Log in again' %}</a></p>
+
+{% endblock %}

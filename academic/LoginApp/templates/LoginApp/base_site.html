@@ -1,9 +1,9 @@
 {% extends "LoginApp/base.html" %}
 
-{% block title %}Academic Login{% endblock %}
+{% block title %}{{ site_title }}{% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'LoginApp:main' %}">Academic Login</a></h1>
+<h1 id="site-name"><a href={{ main_url }}>{{ site_title }}</a></h1>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
