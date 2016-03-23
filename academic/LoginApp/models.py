@@ -5,10 +5,13 @@ from os import urandom
 from random import shuffle
 
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.contrib.auth.models import User, Group
 
 
 # Create your models here.
+
 
 # TODO: add django validators for name min length
 class Student(models.Model):
@@ -62,12 +65,24 @@ class Student(models.Model):
             group, created = Group.objects.get_or_create(name='student')
             self.user.groups.add(group)
         super(Student, self).save(*args, **kwargs)
-
-    # Don't work on bulk, will have to use signals
-    def delete(self, *args, **kwargs):
-        user = self.user
-        user.delete()
-        super(Student, self).delete(*args, **kwargs)
-
+        
     def __str__(self):
         return self.last_name + " " + self.first_name
+
+
+### SIGNALS start here
+
+# Global flag to avoid infinite recursion
+is_in_pre_delete = False
+@receiver(pre_delete, sender=Student)
+def pre_delete_students(sender, **kwargs):
+    global is_in_pre_delete
+    if is_in_pre_delete:
+        return
+    if not isinstance(kwargs["instance"], Student):
+        return
+    is_in_pre_delete = True
+    user = kwargs["instance"].user
+    kwargs["instance"].user = None
+    user.delete()
+    is_in_pre_delete = False

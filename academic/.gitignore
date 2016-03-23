@@ -1,6 +1,5 @@
-experiment/pollapp/.idea
-experiment/academic/.idea/workspace.xml
-experiment/academic/.idea/misc.xml
+.idea/workspace.xml
+.idea/misc.xml
 *.pyc
 *.sqlite3
 
