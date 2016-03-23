@@ -37,10 +37,10 @@ class Student(models.Model):
     def _gen_pass(self):
         alphabet = list(string.ascii_letters + string.digits + "!@#$%^&*")
         shuffle(alphabet)
-        bytes = urandom(13)
+        rbytes = urandom(13)
         password = ""
-        for el in bytes:
-            bval = struct.unpack('B', el)[0]
+        for el in rbytes:
+            bval = struct.unpack('B', bytes([el]))[0]
             password += alphabet[bval % len(alphabet)]
         return password
 

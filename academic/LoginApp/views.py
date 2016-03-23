@@ -34,7 +34,7 @@ def login_page(request):
             return render(request, "LoginApp/login.html", {'form': authForm})
 
         login(request, user)
-        if not request.GET["next"]:
+        if "next" not in request.GET:
             return redirect("LoginApp:main")
         else:
             return HttpResponseRedirect(request.GET["next"])
