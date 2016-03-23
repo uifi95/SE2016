@@ -65,12 +65,12 @@ class Student(models.Model):
             group, created = Group.objects.get_or_create(name='student')
             self.user.groups.add(group)
         super(Student, self).save(*args, **kwargs)
-        
+
     def __str__(self):
         return self.last_name + " " + self.first_name
 
 
-### SIGNALS start here
+### SIGNALS start here ###
 
 # Global flag to avoid infinite recursion
 is_in_pre_delete = False
