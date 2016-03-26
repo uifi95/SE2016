@@ -58,9 +58,8 @@ def change_account(request):
     if form.is_valid():
         form.save()
         update_session_auth_hash(request, form.user)
-        if form.user.student_set.count() and not form.user.student_set.first().is_activated:
-            # Maybe change with a parent model for all types of entities?
-            obj = form.user.student_set.first()
+        if not form.user.client_set.first().is_activated:
+            obj = form.user.client_set.first()
             obj.is_activated = True
             obj.save()
         return render(request, "LoginApp/done_change_account.html", {'title': "Account updated!"})
