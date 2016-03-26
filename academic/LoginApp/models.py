@@ -94,7 +94,7 @@ class Student(Client):
             lastTwo = self.first_name[:2]
         else:
             lastTwo = self.first_name
-        return firstTwo + lastTwo + str(self.id_number)
+        return (firstTwo + lastTwo + str(self.id_number)).lower()
 
     def save(self, *args, **kwargs):
         if not self.pk:
