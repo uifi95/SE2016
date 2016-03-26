@@ -66,6 +66,21 @@ class Client(models.Model):
     def __str__(self):
         return self.last_name + " " + self.first_name
 
+class Staff(Client):
+    class Meta:
+        verbose_name_plural = 'Staff'
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self._create_user()
+            self._set_type("staff")
+            self.user.is_staff = True
+            self.user.save()
+            self.user.is_admin = True
+            self.user.save()
+            self.user.is_superuser = True
+            self.user.save()
+        super(Staff, self).save(*args, **kwargs)
 
 class Student(Client):
     id_number = models.IntegerField("Identification number", unique=True)
