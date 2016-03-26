@@ -3,9 +3,11 @@ from django.core.exceptions import ValidationError
 from django.forms import Form, CharField, PasswordInput
 from django.contrib.auth.models import User
 
+
 class LoginForm(Form):
     username = CharField(label="Username:", max_length=30)
     password = CharField(label="Password:", widget=PasswordInput())
+
 
 class CustomizeAccountForm(PasswordChangeForm):
     username = CharField(label="Username:", max_length=30)
@@ -24,9 +26,7 @@ class CustomizeAccountForm(PasswordChangeForm):
 
         return newusername
 
-    def save(self, commit = True):
+    def save(self, commit=True):
         super(PasswordChangeForm, self).save(commit)
         self.user.username = self.cleaned_data.get("username")
         self.user.save()
-
-

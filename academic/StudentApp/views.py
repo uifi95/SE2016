@@ -9,4 +9,4 @@ from LoginApp.user_checks import student_check
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(student_check, login_url=reverse_lazy('LoginApp:login'))
 def main_page(request):
-    return render(request, "StudentApp/student_main.html", {"has_permission" : True})
+    return render(request, "StudentApp/student_main.html", {"has_permission": True})

@@ -35,7 +35,8 @@ class Client(models.Model):
         self.user.groups.add(group)
         self.type = type
 
-    def _gen_pass(self):
+    @staticmethod
+    def _gen_pass():
         alphabet = list(string.ascii_letters + string.digits + "!@#$%^&*")
         shuffle(alphabet)
         rbytes = urandom(13)
@@ -88,8 +89,7 @@ class Student(Client):
 
 
 
-### SIGNALS start here ###
-
+# SIGNALS start here
 # Global flag to avoid infinite recursion
 is_in_pre_delete = False
 @receiver(pre_delete, sender=Client)
