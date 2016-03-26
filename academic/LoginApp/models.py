@@ -25,16 +25,17 @@ class Student(models.Model):
 
     def _gen_user(self):
         if len(self.last_name) >= 2:
-            firstTwo = self.last_name[:2]
+            firsttwo = self.last_name[:2]
         else:
-            firstTwo = self.last_name
+            firsttwo = self.last_name
         if len(self.first_name) >= 2:
-            lastTwo = self.first_name[:2]
+            lasttwo = self.first_name[:2]
         else:
-            lastTwo = self.first_name
-        return firstTwo + lastTwo + str(self.id_number)
+            lasttwo = self.first_name
+        return firsttwo + lasttwo + str(self.id_number)
 
-    def _gen_pass(self):
+    @staticmethod
+    def _gen_pass():
         alphabet = list(string.ascii_letters + string.digits + "!@#$%^&*")
         shuffle(alphabet)
         rbytes = urandom(13)
@@ -70,10 +71,11 @@ class Student(models.Model):
         return self.last_name + " " + self.first_name
 
 
-### SIGNALS start here ###
-
+# SIGNALS start here
 # Global flag to avoid infinite recursion
 is_in_pre_delete = False
+
+
 @receiver(pre_delete, sender=Student)
 def pre_delete_students(sender, **kwargs):
     global is_in_pre_delete
