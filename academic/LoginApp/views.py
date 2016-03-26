@@ -19,10 +19,8 @@ def main_page(request):
 
 
 def login_page(request):
-    if request.user.is_authenticated():
-        return redirect('LoginApp:main')
+    newForm = LoginForm()
     if request.method != 'POST':
-        newForm = LoginForm()
         return render(request, "LoginApp/login.html", {'form':newForm})
     authForm = LoginForm(data=request.POST)
     if authForm.is_valid():
