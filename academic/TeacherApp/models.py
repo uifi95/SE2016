@@ -6,6 +6,9 @@ from StudentApp.models import StudyLine
 
 
 class Course(models.Model):
+    class Meta:
+        unique_together = (('name', 'teacher', 'study_line'),)
+
     name = models.CharField(max_length=100)
     teacher = models.ForeignKey(Teacher, null=False, default=1)
     study_line = models.OneToOneField(StudyLine, null=False)
