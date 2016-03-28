@@ -107,19 +107,6 @@ class Student(Client):
 
 
 class Teacher(Client):
-    id_number = models.IntegerField("Identification number", unique=True)
-
-    def _gen_user(self):
-        if len(self.last_name) >= 2:
-            first_two = self.last_name[:2]
-        else:
-            first_two = self.last_name
-        if len(self.first_name) >= 2:
-            last_two = self.first_name[:2]
-        else:
-            last_two = self.first_name
-        return (first_two + last_two + str(self.id_number)).lower()
-
     def save(self, *args, **kwargs):
         if not self.pk:
             self._create_user()
