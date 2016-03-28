@@ -1,10 +1,14 @@
 {% extends "StudentApp/base_site.html" %}
 {% load i18n admin_static %}
+{% load staticfiles %}
 
+{% block extrahead %}
+    <link rel="stylesheet" type="text/css" href="{% static 'StudentApp/style.css' %}"/>
+{% endblock %}
 
 {% block nav-global %}
-    <a href="{% url 'StudentApp:main' %}">Main Page</a>
-    <a href="{% url 'StudentApp:grades' %}">Grades</a>
+    <a class="menu" id="menu" href="{% url 'StudentApp:main' %}">Main Page</a>
+    <a class="menu" id="menu" href="{% url 'StudentApp:grades' %}">Grades</a>
 {% endblock %}
 
 {% block content_title %}
@@ -13,6 +17,7 @@
 {% block breadcrumbs %}{% endblock %}
 
 {% block content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'StudentApp/style.css' %}"/>
     <table>
         <tr>
             <th>Course</th>
