@@ -1,10 +1,20 @@
 {% extends "LoginApp/base.html" %}
+{% load i18n admin_static %}
+{% load staticfiles %}
 
 {% block title %}Academic Students{% endblock %}
+
+{% block extrahead %}
+    <link rel="stylesheet" type="text/css" href="{% static 'StudentApp/style.css' %}"/>
+{% endblock %}
 
 {% block branding %}
 
 <h1 id="site-name"><a href="{% url 'StudentApp:main' %}">Academic Students</a></h1>
 {% endblock %}
 
-{% block nav-global %}{% endblock %}
+
+{% block nav-global %}
+    <a class="menu" id="menu" href="{% url 'StudentApp:main' %}">Main Page</a>
+    <a class="menu" id="menu" href="{% url 'StudentApp:grades' %}">Grades</a>
+{% endblock %}
