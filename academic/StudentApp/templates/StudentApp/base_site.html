@@ -1,16 +1,15 @@
-{% extends "LoginApp/base.html" %}
+{% extends "StudentApp/base.html" %}
 {% load i18n admin_static %}
 {% load staticfiles %}
 
-{% block title %}Academic Students{% endblock %}
+{% block title %}{{ site_title }}{% endblock %}
 
 {% block extrahead %}
     <link rel="stylesheet" type="text/css" href="{% static 'StudentApp/style.css' %}"/>
 {% endblock %}
 
 {% block branding %}
-
-<h1 id="site-name"><a href="{% url 'StudentApp:main' %}">Academic Students</a></h1>
+    <h1 id="site-name"><a href="{% url 'StudentApp:main' %}">Academic Students</a></h1>
 {% endblock %}
 
 

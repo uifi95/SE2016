@@ -1,9 +1,8 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
-from django.shortcuts import render, redirect, render_to_response
+from django.shortcuts import render, redirect
 
 # Create your views here.
-from django.template import RequestContext
 
 from LoginApp.models import Student
 from LoginApp.user_checks import student_check

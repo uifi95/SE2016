@@ -21,7 +21,7 @@ def main_page(request):
 def login_page(request):
     newForm = LoginForm()
     if request.method != 'POST':
-        return render(request, "LoginApp/login.html", {'form':newForm})
+        return render(request, "LoginApp/login.html", {'form': newForm})
     authForm = LoginForm(data=request.POST)
     if authForm.is_valid():
         username = authForm.cleaned_data["username"]
