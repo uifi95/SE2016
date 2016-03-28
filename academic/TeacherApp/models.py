@@ -11,7 +11,7 @@ class Course(models.Model):
 
     name = models.CharField(max_length=100)
     teacher = models.ForeignKey(Teacher, null=False, default=1)
-    study_line = models.OneToOneField(StudyLine, null=False)
+    study_line = models.ForeignKey(StudyLine, null=False)
 
     def __str__(self):
         return self.name
