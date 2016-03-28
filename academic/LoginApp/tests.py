@@ -1,22 +1,43 @@
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.test import TestCase
-from LoginApp.models import Client, Staff, Student
+from LoginApp.models import Client, Staff, Student, Teacher
 
 
 # Create your tests here.
+from StudentApp.models import StudyLine
 
 
-class StudentMethodTests(TestCase):
+# class StudentMethodTests(TestCase):
+#     def test_user(self):
+#         st = StudyLine(name="info")
+#         s = Student(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
+#         s.save()
+#         self.assertEquals(s.get_user(), "tete10")
+#         self.assertEquals(s.study_line, "info")
+#     def test_duplicate(self):
+#         st = StudyLine(name="info")
+#         s = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
+#         s.save()
+#         s2 = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
+#         try:
+#             s2.save()
+#             self.assertFalse(True)
+#         except IntegrityError:
+#             self.assertTrue(True)
+
+
+class TeacherMethodTests(TestCase):
     def test_user(self):
-        s = Student(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10)
+        s = Teacher(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10)
         s.save()
         self.assertEquals(s.get_user(), "tete10")
+        self.assertEquals(s.type, "teacher")
 
     def test_duplicate(self):
-        s = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10)
+        s = Teacher(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10)
         s.save()
-        s2 = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10)
+        s2 = Teacher(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10)
         try:
             s2.save()
             self.assertFalse(True)
