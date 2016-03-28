@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.test import TestCase
 from LoginApp.models import Client, Staff, Student
+
+
 # Create your tests here.
 
 
@@ -20,6 +22,7 @@ class StudentMethodTests(TestCase):
             self.assertFalse(True)
         except IntegrityError:
             self.assertTrue(True)
+
 
 class ClientStaffMethodTests(TestCase):
     def test_delete(self):

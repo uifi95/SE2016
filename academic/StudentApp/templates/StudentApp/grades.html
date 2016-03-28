@@ -1,0 +1,30 @@
+{% extends "StudentApp/base_site.html" %}
+{% load i18n admin_static %}
+
+
+{% block nav-global %}
+    <a href="{% url 'StudentApp:main' %}">Main Page</a>
+    <a href="{% url 'StudentApp:grades' %}">Grades</a>
+{% endblock %}
+
+{% block content_title %}
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+    <table>
+        <tr>
+            <th>Course</th>
+            <th>Teacher</th>
+            <th>Grade</th>
+        </tr>
+        {% for item in table %}
+            <tr>
+                <td>{{ item.course }}</td>
+                <td>{{ item.course.teacher }}</td>
+                <td>{{ item.value }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

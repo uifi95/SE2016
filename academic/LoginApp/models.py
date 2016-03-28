@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User, Group
 
 # Create your models here.
+from StudentApp.models import StudyLine
 
 
 class Client(models.Model):
@@ -50,7 +51,6 @@ class Client(models.Model):
         self.temp_pass = self._gen_pass()
         self.user = User.objects.create_user(username=self._gen_user(), password=self.temp_pass, email=self.email)
 
-
     def get_temp_pass(self):
         if self.is_activated:
             return ""
@@ -65,6 +65,7 @@ class Client(models.Model):
 
     def __str__(self):
         return self.last_name + " " + self.first_name
+
 
 class Staff(Client):
     class Meta:
@@ -82,8 +83,10 @@ class Staff(Client):
             self.user.save()
         super(Staff, self).save(*args, **kwargs)
 
+
 class Student(Client):
     id_number = models.IntegerField("Identification number", unique=True)
+    study_line = models.ForeignKey(StudyLine, null=False)
 
     def _gen_user(self):
         if len(self.last_name) >= 2:
@@ -103,10 +106,32 @@ class Student(Client):
         super(Student, self).save(*args, **kwargs)
 
 
+class Teacher(Client):
+    id_number = models.IntegerField("Identification number", unique=True)
+
+    def _gen_user(self):
+        if len(self.last_name) >= 2:
+            first_two = self.last_name[:2]
+        else:
+            first_two = self.last_name
+        if len(self.first_name) >= 2:
+            last_two = self.first_name[:2]
+        else:
+            last_two = self.first_name
+        return (first_two + last_two + str(self.id_number)).lower()
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self._create_user()
+            self._set_type("teacher")
+        super(Teacher, self).save(*args, **kwargs)
+
 
 # SIGNALS start here
 # Global flag to avoid infinite recursion
 is_in_pre_delete = False
+
+
 @receiver(pre_delete, sender=Client)
 def pre_delete_client(sender, **kwargs):
     global is_in_pre_delete

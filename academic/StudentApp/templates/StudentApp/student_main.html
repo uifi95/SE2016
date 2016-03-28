@@ -2,12 +2,14 @@
 {% load i18n admin_static %}
 
 
-{% block nav-global %}{% endblock %}
+{% block nav-global %}
+    <a href="{% url 'StudentApp:main' %}">Main Page</a>
+    <a href="{% url 'StudentApp:grades' %}">Grades</a>
+{% endblock %}
 
 {% block content_title %}{% endblock %}
 
 {% block breadcrumbs %}{% endblock %}
-
 {% block content %}
-<p>Welcome student! This page is still under construction...</p>
+    <h1>We are still deciding what to do with you,{{ first_name }}</h1>
 {% endblock %}

@@ -14,7 +14,6 @@ from LoginApp.forms import LoginForm, CustomizeAccountForm
 def main_page(request):
     if request.user.is_staff:
         return redirect('admin:index')
-
     if request.user.groups.filter(name="student").count():
         return redirect('StudentApp:main')
 
