@@ -2,4 +2,4 @@
 .idea/misc.xml
 *.pyc
 *.sqlite3
-
+.idea*
