@@ -8,20 +8,20 @@
 {% block content %}
    <form action="" name="gradeform" method="get">
        {% csrf_token %}
-  <select name="selectedcourse" >
+  <select name="selected_course" >
     <option selected="selected" disabled>Select Course:</option>
       {% for item in courses %}
         <option >{{item.name}}</option>
         {% endfor%}
   </select>
-       <select name="selectedstudent">
+       <select name="selected_student">
     <option selected="selected" disabled>Select Student:</option>
       {% for item in students %}
         <option >{{item.first_name}} {{item.last_name}}</option>
         {% endfor%}
   </select>
        <input type="text" name="grade" size="1"/>
-  <input type="submit" value="Select" name="sel">
+  <input type="submit" value="Select" name="select_button">
     </form>
 
 
