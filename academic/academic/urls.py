@@ -25,5 +25,6 @@ admin.AdminSite.site_title = "Academic Admin"
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^student/', include('StudentApp.urls')),
+    url(r'^teacher/', include('TeacherApp.urls')),
     url(r'^', include('LoginApp.urls'))
 ]

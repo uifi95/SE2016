@@ -16,6 +16,8 @@ def main_page(request):
         return redirect('admin:index')
     if request.user.groups.filter(name="student").count():
         return redirect('StudentApp:main')
+    if request.user.groups.filter(name="teacher").count():
+        return redirect('TeacherApp:main')
 
 
 def login_page(request):
