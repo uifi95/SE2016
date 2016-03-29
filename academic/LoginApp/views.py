@@ -16,12 +16,14 @@ def main_page(request):
         return redirect('admin:index')
     if request.user.groups.filter(name="student").count():
         return redirect('StudentApp:main')
+    if request.user.groups.filter(name="teacher").count():
+        return redirect('TeacherApp:main')
 
 
 def login_page(request):
     newForm = LoginForm()
     if request.method != 'POST':
-        return render(request, "LoginApp/login.html", {'form':newForm})
+        return render(request, "LoginApp/login.html", {'form': newForm})
     authForm = LoginForm(data=request.POST)
     if authForm.is_valid():
         username = authForm.cleaned_data["username"]

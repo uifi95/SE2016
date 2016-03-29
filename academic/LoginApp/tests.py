@@ -8,41 +8,45 @@ from LoginApp.models import Client, Staff, Student, Teacher
 from StudentApp.models import StudyLine
 
 
-# class StudentMethodTests(TestCase):
-#     def test_user(self):
-#         st = StudyLine(name="info")
-#         s = Student(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
-#         s.save()
-#         self.assertEquals(s.get_user(), "tete10")
-#         self.assertEquals(s.study_line, "info")
-#     def test_duplicate(self):
-#         st = StudyLine(name="info")
-#         s = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
-#         s.save()
-#         s2 = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
-#         try:
-#             s2.save()
-#             self.assertFalse(True)
-#         except IntegrityError:
-#             self.assertTrue(True)
-
-
-class TeacherMethodTests(TestCase):
+class StudentMethodTests(TestCase):
     def test_user(self):
-        s = Teacher(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10)
+        st = StudyLine(name="info")
+        st.save()
+        s = Student(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
         s.save()
         self.assertEquals(s.get_user(), "tete10")
-        self.assertEquals(s.type, "teacher")
+        self.assertEquals(s.study_line.name, "info")
+
 
     def test_duplicate(self):
-        s = Teacher(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10)
+        st = StudyLine(name="info")
+        st.save()
+        s = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
         s.save()
-        s2 = Teacher(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10)
+        s2 = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
         try:
             s2.save()
             self.assertFalse(True)
         except IntegrityError:
             self.assertTrue(True)
+
+
+class TeacherMethodTests(TestCase):
+    def test_user(self):
+        s = Teacher(first_name="Test1", last_name="test1", email="bla@bla.com")
+        s.save()
+        self.assertEquals(s.get_user(), "ttest1")
+        self.assertEquals(s.type, "teacher")
+
+    def test_duplicate(self):
+        s = Teacher(first_name="test1", last_name="test1", email="bla@bla.com")
+        s.save()
+        s2 = Teacher(first_name="test1", last_name="test1", email="bla@bla.com")
+        try:
+            s2.save()
+            self.assertFalse(False)
+        except IntegrityError:
+            self.assertTrue(False)
 
 
 class ClientStaffMethodTests(TestCase):
