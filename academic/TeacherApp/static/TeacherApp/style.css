@@ -1,0 +1,22 @@
+table {
+    margin-left: 3%;
+}
+
+.menu {
+    margin-left: 7px;
+    margin-right: 7px;
+    font-size: 15px;
+}
+
+#menu {
+    position: relative;
+   left: 40px;
+}
+
+
+a:hover {
+    color: #E9D201;
+    text-decoration: none;
+}
+
+

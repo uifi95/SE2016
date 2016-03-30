@@ -5,7 +5,7 @@
 {% block title %}Academic Teaching{% endblock %}
 
 {% block extrahead %}
-    <link rel="stylesheet" type="text/css" href="{% static 'StudentApp/style.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'TeacherApp/style.css' %}"/>
 {% endblock %}
 
 {% block branding %}
@@ -16,5 +16,5 @@
 
 {% block nav-global %}
     <a class="menu" id="menu" href="{% url 'TeacherApp:main' %}">Main Page</a>
-    <a class="menu" id="menu" href="{% url 'TeacherApp:grades' %}">Grades</a>
+    <a class="menu" id="menu" href="{% url 'TeacherApp:courses' %}">Courses</a>
 {% endblock %}
