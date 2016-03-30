@@ -47,18 +47,23 @@ def courses(request):
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
 def students(request, course_id):
     course = get_object_or_404(Course, pk=int(course_id))
+    args = ('first_name', 'last_name')
+    all_students = Student.objects.filter(study_line=course.study_line).order_by(*args)
+    args = ('student__' + i for i in args)
     grades = [elem.value for elem in
-              Grade.objects.filter(student__in=Student.objects.filter(study_line=course.study_line), course=course)]
-    all_students = Student.objects.filter(study_line=course.study_line)
-    for i in range(all_students.count() - len(grades)):
-        grades = grades + ['']
+              Grade.objects.filter(student__in=all_students, course=course).order_by(*args)]
+    count = 0
+    for student in all_students:
+        if not Grade.objects.filter(student=student, course=course).exists():
+            grades = grades[:count] + [''] + grades[count:]
+        count += 1
     return render(request, "TeacherApp/students.html",
                   {"students": zip(all_students, grades), 'course_id': course_id, "has_permission": True})
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
-def edit(request, course_id, student_id):
+def edit(request, course_id, student_id, grade_exists=None):
     if request.GET.get('edit_button'):
         value = int(request.GET.get('grade'))
         student = get_object_or_404(Student, pk=int(student_id))
@@ -72,11 +77,16 @@ def edit(request, course_id, student_id):
         grade.save()
         return students(request, course_id)
     course = get_object_or_404(Course, pk=int(course_id))
+    args = ('first_name', 'last_name')
+    all_students = Student.objects.filter(study_line=course.study_line).order_by(*args)
+    args = ('student__' + i for i in args)
     grades = [elem.value for elem in
-              Grade.objects.filter(student__in=Student.objects.filter(study_line=course.study_line), course=course)]
-    all_students = Student.objects.filter(study_line=course.study_line)
-    for i in range(all_students.count() - len(grades)):
-        grades = grades + ['']
+              Grade.objects.filter(student__in=all_students, course=course).order_by(*args)]
+    count = 0
+    for student in all_students:
+        if not Grade.objects.filter(student=student, course=course).exists():
+            grades = grades[:count] + [''] + grades[count:]
+        count += 1
     return render(request, "TeacherApp/edit.html",
                   {"students": zip(all_students, grades), "student_id": int(student_id), "course_id": course_id,
                    "has_permission": True})
