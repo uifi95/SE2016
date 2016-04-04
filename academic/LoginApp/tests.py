@@ -17,7 +17,6 @@ class StudentMethodTests(TestCase):
         self.assertEquals(s.get_user(), "tete10")
         self.assertEquals(s.study_line.name, "info")
 
-
     def test_duplicate(self):
         st = StudyLine(name="info")
         st.save()
@@ -50,6 +49,16 @@ class TeacherMethodTests(TestCase):
 
 
 class ClientStaffMethodTests(TestCase):
+    def test_reset_pass(self):
+        c = Staff(first_name="aest1", last_name="test1", email="bla@bla.com")
+        c.save()
+        temp_pass = c.get_temp_pass()
+        c.is_activated = True
+        c.save()
+        c.reset_password()
+        self.assertFalse(c.is_activated)
+        self.assertNotEqual(temp_pass, c.get_temp_pass())
+
     def test_delete(self):
         c = Staff(first_name="aest1", last_name="test1", email="bla@bla.com")
         c.save()

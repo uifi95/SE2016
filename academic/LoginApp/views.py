@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -7,7 +8,7 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.forms import ValidationError
 
-from LoginApp.forms import LoginForm, CustomizeAccountForm
+from LoginApp.forms import LoginForm, CustomizeAccountForm, ResetPasswordForm
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -19,6 +20,31 @@ def main_page(request):
     if request.user.groups.filter(name="teacher").count():
         return redirect('TeacherApp:main')
 
+def reset_pass(request):
+    newForm = ResetPasswordForm()
+    if request.method != 'POST':
+        return render(request, "LoginApp/reset_pass.html", {'form': newForm})
+    changePassForm = ResetPasswordForm(data=request.POST)
+    if changePassForm.is_valid():
+        username = changePassForm.cleaned_data["username"]
+        email = changePassForm.cleaned_data["email"]
+        if not User.objects.filter(username=username).exists():
+            changePassForm.add_error(None, ValidationError("Username doesn't exist!"))
+            return render(request, "LoginApp/reset_pass.html", {'form': changePassForm})
+
+        user = User.objects.filter(username=username).first()
+        client = user.client_set.first()
+        if client.email != email:
+            changePassForm.add_error(None, ValidationError("Username and email address don't match!"))
+            return render(request, "LoginApp/reset_pass.html", {'form': changePassForm})
+
+        client.reset_password()
+        if request.user.is_authenticated():
+            logout(request)
+        return render(request, "LoginApp/reset_success.html")
+
+    else:
+        return render(request, "LoginApp/reset_pass.html", {'form': changePassForm})
 
 def login_page(request):
     newForm = LoginForm()

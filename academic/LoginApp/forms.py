@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError
-from django.forms import Form, CharField, PasswordInput
+from django.forms import Form, CharField, PasswordInput, EmailField
 from django.contrib.auth.models import User
 
 
@@ -8,6 +8,9 @@ class LoginForm(Form):
     username = CharField(label="Username:", max_length=30)
     password = CharField(label="Password:", widget=PasswordInput())
 
+class ResetPasswordForm(Form):
+    username = CharField(label="Username:", max_length=30)
+    email = EmailField(label="Email:")
 
 class CustomizeAccountForm(PasswordChangeForm):
     username = CharField(label="Username:", max_length=30)

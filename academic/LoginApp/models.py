@@ -36,6 +36,14 @@ class Client(models.Model):
         self.user.groups.add(group)
         self.type = type
 
+    def reset_password(self):
+        self.temp_pass = self._gen_pass()
+        self.save()
+        self.is_activated = False
+        self.save()
+        self.user.set_password(self.temp_pass)
+        self.user.save()
+
     @staticmethod
     def _gen_pass():
         alphabet = list(string.ascii_letters + string.digits + "!@#$%^&*")
