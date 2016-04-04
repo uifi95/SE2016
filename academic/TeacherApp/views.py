@@ -65,7 +65,10 @@ def students(request, course_id):
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
 def edit(request, course_id, student_id, grade_exists=None):
     if request.GET.get('edit_button'):
-        value = int(request.GET.get('grade'))
+        try:
+            value = int(request.GET.get('grade'))
+        except Exception:
+            return students(request, course_id)
         student = get_object_or_404(Student, pk=int(student_id))
         course = get_object_or_404(Course, pk=int(course_id))
         grade_exists = Grade.objects.filter(student=student, course=course).exists()
