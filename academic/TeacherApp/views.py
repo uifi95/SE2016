@@ -1,7 +1,5 @@
 from LoginApp.models import Teacher
 from LoginApp.user_checks import teacher_check
-from StudentApp.models import StudyLine
-from TeacherApp.models import Course
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
@@ -24,21 +22,9 @@ def teacher_main(request):
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
 def courses(request):
-    # if request.GET.get('select_button'):
-    #     value = int(request.GET.get('grade'))
-    #     student_name = request.GET.get('selected_student')
-    #     first_name = student_name.split(" ")[0]
-    #     student = Student.objects.all().filter(first_name=first_name)
-    #     course_name = request.GET.get('selected_course')
-    #     course = Course.objects.all().filter(name=course_name).first()
-    #     grade = Grade(value=value, student=student[0], course=course[0])
-    #     grade.save()
-    # current_teacher = request.user.client_set.first()
-    # courses = Course.objects.filter(teacher=current_teacher)
-    # students = Student.objects.all()
     current_teacher = request.user.client_set.first()
     all_courses = Course.objects.filter(teacher=current_teacher)
-    study_lines = StudyLine.objects.filter(course__teacher=current_teacher).distinct()
+    study_lines = [i[0] for i in Student.CHOICES if Course.objects.filter(study_line=i[0]).count() != 0]
     return render(request, "TeacherApp/courses.html",
                   {"courses": all_courses, "study_lines": study_lines, "has_permission": True})
 

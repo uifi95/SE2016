@@ -9,8 +9,9 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User, Group
 
+
 # Create your models here.
-from StudentApp.models import StudyLine
+
 
 
 class Client(models.Model):
@@ -20,6 +21,12 @@ class Client(models.Model):
     user = models.ForeignKey(User, null=True)
     temp_pass = models.CharField(max_length=40)
     is_activated = models.BooleanField("Active", default=False)
+    INFO = 'IT'
+    MATE = 'MATH'
+    MATE_INFO = 'IT_MATH'
+    CHOICES = [(INFO, 'Informatics'),
+               (MATE, 'Mathematics'),
+               (MATE_INFO, 'Mathematics & Informatics')]
     type = models.CharField(max_length=30)
 
     def _gen_user(self):
@@ -93,8 +100,14 @@ class Staff(Client):
 
 
 class Student(Client):
+    INFO = 'Informatics'
+    MATE = 'Mathematics'
+    MATE_INFO = 'Mathematics & Informatics'
+    CHOICES = [(INFO, INFO),
+               (MATE, MATE),
+               (MATE_INFO, MATE_INFO)]
     id_number = models.IntegerField("Identification number", unique=True)
-    study_line = models.ForeignKey(StudyLine, null=False)
+    study_line = models.CharField(max_length=50, choices=CHOICES)
 
     def _gen_user(self):
         if len(self.last_name) >= 2:

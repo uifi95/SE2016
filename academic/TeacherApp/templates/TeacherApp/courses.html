@@ -7,7 +7,7 @@
 
 {% block content %}
     {% for line in study_lines %}
-        <h1>{{ line.name }}</h1>
+        <h1>{{ line }}</h1>
         <table>
             {% for course in courses %}
                 {% if course.study_line == line %}
