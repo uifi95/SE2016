@@ -39,10 +39,13 @@
   </div>
   <div class="form-row">
     {{ form.email.errors }}
-    {{ form.email.label_tag }} {{ form.email }}
+       <label id="email">
+    {{ form.email.label_tag }}
+       </label>
+       {{ form.email }}
   </div>
-  <div class="submit-row">
-    <label>&nbsp;</label><input type="submit" value="{% trans 'Reset password!' %}" />
+  <div class="submit-row" id="btn">
+    <label >&nbsp;</label><input type="submit"  value="{% trans 'Reset password!' %}" />
   </div>
 </form>
 
