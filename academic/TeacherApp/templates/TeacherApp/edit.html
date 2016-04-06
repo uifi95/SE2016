@@ -6,23 +6,6 @@
 {% block breadcrumbs %}{% endblock %}
 
 {% block content %}
-    {#   <form action="" name="gradeform" method="get">#}
-    {#       {% csrf_token %}#}
-    {#  <select name="selected_course" >#}
-    {#    <option selected="selected" disabled>Select Course:</option>#}
-    {#      {% for item in courses %}#}
-    {#        <option >{{item.name}}</option>#}
-    {#        {% endfor%}#}
-    {#  </select>#}
-    {#       <select name="selected_student">#}
-    {#    <option selected="selected" disabled>Select Student:</option>#}
-    {#      {% for item in students %}#}
-    {#        <option >{{item.first_name}} {{item.last_name}}</option>#}
-    {#        {% endfor%}#}
-    {#  </select>#}
-    {#       <input type="text" name="grade" size="1"/>#}
-    {#  <input type="submit" value="Select" name="select_button">#}
-    {#    </form>#}
     <h1>Students</h1>
     <table>
         <tr>
@@ -33,22 +16,22 @@
         {% for student,grade in students %}
             <tr>
                 {% if student.id == student_id %}
-                    <td>{{ student }}</td>
-                    <td>{{ student.id_number }}</td>
+                    <td id="centrusel">{{ student }}</td>
+                    <td id="centrusel">{{ student.id_number }}</td>
                     <form>
-                        <td>
-                            <input type="text" name="grade" size="1"/>
+                        <td id="centru">
+                            <input type="text" name="grade" size="1" title="grade"/>
                         </td>
                         <td>
                             <input type="submit" value="Finish Editing" name="edit_button">
                         </td>
                     </form>
                 {% else %}
-                    <td>{{ student }}</td>
-                    <td>{{ student.id_number }}</td>
-                    <td>{{ grade }}</td>
+                    <td id="centru">{{ student }}</td>
+                    <td id="centru">{{ student.id_number }}</td>
+                    <td id="centru">{{ grade }}</td>
                     <td><a href="{% url 'TeacherApp:edit' course_id=course_id student_id=student.id %}">
-                        <button>Edit Grades</button>
+                        <button class="buton">Edit Grade</button>
                     </a></td>
                 {% endif %}
             </tr>

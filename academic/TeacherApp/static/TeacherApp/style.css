@@ -10,13 +10,32 @@ table {
 
 #menu {
     position: relative;
-   left: 40px;
+    left: 40px;
 }
 
-
-a:hover {
-    color: #E9D201;
-    text-decoration: none;
+#menu:hover {
+    color: #f6db5f !important;
+    text-decoration: none !important;
 }
 
+.buton {
+    width: 108px;
+    height: 33px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    background-color: #79AEC8;
+}
+
+.buton:hover {
+    background-color: #6199b7;
+}
+
+#centru {
+    padding-top: 15px;
+}
+
+#centrusel {
+    padding-top: 21px;
+}
 

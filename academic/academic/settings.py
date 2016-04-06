@@ -120,5 +120,6 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "/StudentApp/static"),
-    os.path.join(BASE_DIR, "/TeacherApp/static")
+    os.path.join(BASE_DIR, "/TeacherApp/static"),
+    os.path.join(BASE_DIR, "/LoginApp/static")
 ]

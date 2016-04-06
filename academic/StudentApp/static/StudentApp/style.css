@@ -16,9 +16,9 @@ table {
 }
 
 
-a:hover {
-    color: #E9D201;
-    text-decoration: none;
+#menu:hover {
+    color: #f6db5f !important;
+    text-decoration: none !important;
 }
 
 
