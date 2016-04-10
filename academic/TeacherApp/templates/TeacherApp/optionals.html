@@ -11,17 +11,21 @@
     <br>
     <h2>My optionals:</h2>
     <table>
-    <tr>
-        <th>Optional name</th>
-        <th>Study line</th>
-        <th>Year</th>
-    </tr>
-    {% for opt in optionals %}
         <tr>
-        <td>{{ opt.name }}</td>
-        <td>{{ opt.study_line }}</td>
-        <td>{{ opt.year }}</td>
+            <th>Optional name</th>
+            <th>Study line</th>
+            <th>Year</th>
         </tr>
-    {% endfor %}
+        {% for opt in optionals %}
+            <tr>
+                <td id="centru">{{ opt.name }}</td>
+                <td id="centru">{{ opt.study_line }}</td>
+                <td id="centru">{{ opt.year }}</td>
+                <td><a href={% url 'TeacherApp:delete_optional' opt.id %}>
+                    <button class="buton">Delete Optional
+                    </button>
+                </a></td>
+            </tr>
+        {% endfor %}
     </table>
 {% endblock %}

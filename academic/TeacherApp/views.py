@@ -31,6 +31,14 @@ def optionals(request):
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
+def delete_optional(request, optional_id):
+    course = OptionalCourse.objects.filter(id=optional_id)
+    course.delete()
+    return redirect("TeacherApp:optionals")
+
+
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
 def add_optional(request):
     current_teacher = request.user.client_set.first().teacher
     if request.POST:
@@ -60,7 +68,6 @@ def courses(request):
         years = years + [[i[0] for i in Year.CHOICES if all_courses.filter(year=i[0], study_line=st).count() != 0]]
     return render(request, "TeacherApp/courses.html",
                   {"courses": all_courses, "study_lines": zip(study_lines, years), "has_permission": True})
-
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -113,4 +120,3 @@ def edit(request, course_id, student_id, grade_exists=None):
     return render(request, "TeacherApp/edit.html",
                   {"students": zip(all_students, grades), "student_id": int(student_id), "course_id": course_id,
                    "has_permission": True})
-

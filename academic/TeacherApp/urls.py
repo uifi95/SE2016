@@ -9,7 +9,7 @@ urlpatterns = [
     url(r'^courses/(?P<course_id>\d+)/$', views.students, name='students'),
     url(r'^courses/(?P<course_id>\d+)/(?P<student_id>\d+)/$', views.edit, name='edit'),
     url(r'^optionals/$', views.optionals, name='optionals'),
-    url(r'^optionals/add/$', views.add_optional, name='add_opt')
-
+    url(r'^optionals/add/$', views.add_optional, name='add_opt'),
+    url(r'^optionals/delete/(?P<optional_id>\d+)/$', views.delete_optional, name='delete_optional'),
 
 ]
