@@ -119,6 +119,8 @@ class Teacher(Client):
         if not self.pk:
             self._create_user()
             self._set_type("teacher")
+            self.user.is_admin = True
+            self.user.save()
         super(Teacher, self).save(*args, **kwargs)
 
 

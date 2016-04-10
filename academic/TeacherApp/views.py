@@ -9,7 +9,7 @@ from TeacherApp.forms import *
 
 from LoginApp.models import Student
 
-from TeacherApp.models import Grade
+from TeacherApp.models import Grade, OptionalCourse, Course
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -23,6 +23,34 @@ def teacher_main(request):
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
+def optionals(request):
+    current_teacher = request.user.client_set.first()
+    optional_list = OptionalCourse.objects.filter(teacher=current_teacher)
+    return render(request, "TeacherApp/optionals.html", {"optionals": optional_list, "has_permission": True})
+
+
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
+def add_optional(request):
+    current_teacher = request.user.client_set.first().teacher
+    if request.POST:
+        optform = OptionalForm(data=request.POST)
+        if optform.is_valid():
+            name = optform.cleaned_data["name"]
+            studyLine = optform.cleaned_data["study_line"]
+            year = optform.cleaned_data["year"]
+            newOpt = OptionalCourse(name=name, study_line=studyLine, year=year, teacher=current_teacher)
+            newOpt.save()
+            return redirect("TeacherApp:optionals")
+        else:
+            return render(request, "TeacherApp/add_optional.html", {'form': optform})
+    else:
+        newForm = OptionalForm()
+        return render(request, "TeacherApp/add_optional.html", {'form': newForm})
+
+
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
 def courses(request):
     current_teacher = request.user.client_set.first()
     all_courses = Course.objects.filter(teacher=current_teacher)
@@ -32,6 +60,7 @@ def courses(request):
         years = years + [[i[0] for i in Year.CHOICES if all_courses.filter(year=i[0], study_line=st).count() != 0]]
     return render(request, "TeacherApp/courses.html",
                   {"courses": all_courses, "study_lines": zip(study_lines, years), "has_permission": True})
+
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -84,3 +113,4 @@ def edit(request, course_id, student_id, grade_exists=None):
     return render(request, "TeacherApp/edit.html",
                   {"students": zip(all_students, grades), "student_id": int(student_id), "course_id": course_id,
                    "has_permission": True})
+

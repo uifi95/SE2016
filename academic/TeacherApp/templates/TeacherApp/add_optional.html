@@ -1,0 +1,47 @@
+{% extends "TeacherApp/teacher_main.html" %}
+
+{% block content_title %}
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+{% if form.errors and not form.non_field_errors %}
+<p class="errornote">
+{% if form.errors.items|length == 1 %} "Please correct the error below."{% else %}"Please correct the errors below."{% endif %}
+</p>
+{% endif %}
+
+{% if form.non_field_errors %}
+{% for error in form.non_field_errors %}
+<p class="errornote">
+    {{ error }}
+</p>
+{% endfor %}
+{% endif %}
+
+<div id="content-main">
+
+<form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+  <div class="form-row">
+    {{ form.name.errors }}
+    {{ form.name.label_tag }} {{ form.name }}
+  </div>
+    <div class="form-row">
+    {{ form.study_line.errors }}
+    {{ form.study_line.label_tag }} {{ form.study_line }}
+  </div>
+    <div class="form-row">
+    {{ form.year.errors }}
+    {{ form.year.label_tag }} {{ form.year }}
+  </div>
+  <div class="submit-row" id="btn">
+    <label >&nbsp;</label><input type="submit"  value="Add optional!" />
+  </div>
+</form>
+
+<script type="text/javascript">
+document.getElementById('id_username').focus()
+</script>
+</div>
+{% endblock %}

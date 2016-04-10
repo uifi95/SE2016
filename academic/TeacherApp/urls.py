@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 from . import views
 
@@ -7,6 +7,9 @@ urlpatterns = [
     url(r'^$', views.teacher_main, name='main'),
     url(r'^courses/$', views.courses, name='courses'),
     url(r'^courses/(?P<course_id>\d+)/$', views.students, name='students'),
-    url(r'^courses/(?P<course_id>\d+)/(?P<student_id>\d+)/$', views.edit, name='edit')
+    url(r'^courses/(?P<course_id>\d+)/(?P<student_id>\d+)/$', views.edit, name='edit'),
+    url(r'^optionals/$', views.optionals, name='optionals'),
+    url(r'^optionals/add/$', views.add_optional, name='add_opt')
+
 
 ]

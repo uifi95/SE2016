@@ -1,0 +1,27 @@
+{% extends "TeacherApp/teacher_main.html" %}
+
+{% block content_title %}
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+{% block content %}
+    <a href="{% url 'TeacherApp:add_opt' %}">
+        <button class="buton">Add optional</button>
+    </a>
+    <br>
+    <h2>My optionals:</h2>
+    <table>
+    <tr>
+        <th>Optional name</th>
+        <th>Study line</th>
+        <th>Year</th>
+    </tr>
+    {% for opt in optionals %}
+        <tr>
+        <td>{{ opt.name }}</td>
+        <td>{{ opt.study_line }}</td>
+        <td>{{ opt.year }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}
