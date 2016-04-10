@@ -7,29 +7,58 @@ from django.test.utils import setup_test_environment
 from LoginApp.models import Client, Staff, Student, Teacher, StudyLine
 
 
+class TestUtils:
+    def create_student(self):
+        st = StudyLine.INFO
+        s = Student(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
+        s.save()
+        return s
+
+    def create_staff(self):
+        c = Staff(first_name="aest1", last_name="test1", email="bla@bla.com")
+        c.save()
+        return c
+
+    def create_teacher(self):
+        s = Teacher(first_name="test1", last_name="test1", email="bla@bla.com")
+        s.save()
+        return s
+
 class ViewTests(TestCase):
-    def test_main(self):
+    def test_access(self):
         setup_test_environment()
         c = test.Client()
         response = c.get("/")
         self.assertEquals(response.status_code, 302)
-
+        self.assertEquals(response.url, '/login/?next=/')
+        response = c.get("/student/")
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, '/login/?next=/student/')
+        response = c.get("/teacher/")
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, '/login/?next=/teacher/')
+        response = c.get("/login/")
+        self.assertEquals(response.status_code, 200)
+        response = c.get("/teacher/courses/")
+        self.assertEquals(response.status_code, 302)
+        response = c.get("/logout/")
+        self.assertEquals(response.status_code, 302)
+        response = c.get("/change-account/")
+        self.assertEquals(response.status_code, 302)
+        response = c.get("/reset-pass/")
+        self.assertEquals(response.status_code, 200)
 
 class StudentMethodTests(TestCase):
     def test_user(self):
-        st = StudyLine.INFO
-        s = Student(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
-        s.save()
+        s = TestUtils().create_student()
         self.assertEquals(s.get_user(), "tete10")
-        self.assertEquals(s.study_line, st)
+        self.assertEquals(s.study_line, StudyLine.INFO)
 
     def test_duplicate(self):
-        st = StudyLine.MATE
-        s = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
-        s.save()
-        s2 = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
+        tu = TestUtils()
+        tu.create_student()
         try:
-            s2.save()
+            tu.create_student()
             self.assertFalse(True)
         except IntegrityError:
             self.assertTrue(True)
@@ -37,17 +66,15 @@ class StudentMethodTests(TestCase):
 
 class TeacherMethodTests(TestCase):
     def test_user(self):
-        s = Teacher(first_name="Test1", last_name="test1", email="bla@bla.com")
-        s.save()
+        s = TestUtils().create_teacher()
         self.assertEquals(s.get_user(), "ttest1")
         self.assertEquals(s.type, "teacher")
 
     def test_duplicate(self):
-        s = Teacher(first_name="test1", last_name="test1", email="bla@bla.com")
-        s.save()
-        s2 = Teacher(first_name="test1", last_name="test1", email="bla@bla.com")
+        tu = TestUtils()
+        tu.create_teacher()
         try:
-            s2.save()
+            tu.create_teacher()
             self.assertFalse(False)
         except IntegrityError:
             self.assertTrue(False)
@@ -55,8 +82,7 @@ class TeacherMethodTests(TestCase):
 
 class ClientStaffMethodTests(TestCase):
     def test_reset_pass(self):
-        c = Staff(first_name="aest1", last_name="test1", email="bla@bla.com")
-        c.save()
+        c = TestUtils().create_staff()
         temp_pass = c.get_temp_pass()
         c.is_activated = True
         c.save()
@@ -65,15 +91,13 @@ class ClientStaffMethodTests(TestCase):
         self.assertNotEqual(temp_pass, c.get_temp_pass())
 
     def test_delete(self):
-        c = Staff(first_name="aest1", last_name="test1", email="bla@bla.com")
-        c.save()
+        c = TestUtils().create_staff()
         self.assertEquals(User.objects.count(), 1)
         c.delete()
         self.assertEquals(User.objects.count(), 0)
 
     def test_get_temp(self):
-        c = Staff(first_name="aest1", last_name="test1", email="bla@bla.com")
-        c.save()
+        c = TestUtils().create_staff()
         c.is_activated = True
         self.assertEquals(c.get_temp_pass(), "")
 
@@ -82,34 +106,27 @@ class ClientStaffMethodTests(TestCase):
         self.assertEquals(len(c._gen_pass()), 13)
 
     def test_user_name(self):
-        c = Staff(first_name="aest1", last_name="test1", email="bla@bla.com")
-        c.save()
+        c = TestUtils().create_staff()
         self.assertEquals(c.user.username, "atest1")
 
     def test_user_duplicate(self):
-        c = Staff(first_name="aest1", last_name="test1", email="bla@bla.com")
-        c.save()
-        c2 = Staff(first_name="aest1", last_name="test1", email="bla@bla.com")
-        c2.save()
+        c = TestUtils().create_staff()
+        c2 = TestUtils().create_staff()
         self.assertEquals(c2.user.username, "atest10")
-        c3 = Staff(first_name="aest1", last_name="test1", email="bla@bla.com")
-        c3.save()
+        c3 = TestUtils().create_staff()
         self.assertEquals(c3.user.username, "atest11")
 
     def test_type(self):
-        c = Staff(first_name="test1", last_name="test1", email="bla@bla.com")
-        c.save()
+        c = TestUtils().create_staff()
         self.assertEquals(c.user.groups.first().name, "staff")
         self.assertEquals(c.type, "staff")
 
     def test_type2(self):
-        c = Staff(first_name="test1", last_name="test1", email="bla@bla.com")
-        c.save()
+        c = TestUtils().create_staff()
         c._set_type("masa")
         self.assertEquals(c.user.groups.count(), 2)
         self.assertEquals(c.type, "masa")
 
     def test_active(self):
-        c = Staff(first_name="test1", last_name="test1", email="bla@bla.com")
-        c.save()
+        c = TestUtils().create_staff()
         self.assertEquals(c.is_activated, False)
