@@ -1,4 +1,4 @@
-from LoginApp.models import Teacher
+from LoginApp.models import Teacher, StudyLine
 from LoginApp.user_checks import teacher_check
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
@@ -24,7 +24,7 @@ def teacher_main(request):
 def courses(request):
     current_teacher = request.user.client_set.first()
     all_courses = Course.objects.filter(teacher=current_teacher)
-    study_lines = [i[0] for i in Student.CHOICES if Course.objects.filter(study_line=i[0]).count() != 0]
+    study_lines = [i[0] for i in StudyLine.CHOICES if Course.objects.filter(study_line=i[0]).count() != 0]
     return render(request, "TeacherApp/courses.html",
                   {"courses": all_courses, "study_lines": study_lines, "has_permission": True})
 
