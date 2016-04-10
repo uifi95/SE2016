@@ -21,12 +21,6 @@ class Client(models.Model):
     user = models.ForeignKey(User, null=True)
     temp_pass = models.CharField(max_length=40)
     is_activated = models.BooleanField("Active", default=False)
-    INFO = 'IT'
-    MATE = 'MATH'
-    MATE_INFO = 'IT_MATH'
-    CHOICES = [(INFO, 'Informatics'),
-               (MATE, 'Mathematics'),
-               (MATE_INFO, 'Mathematics & Informatics')]
     type = models.CharField(max_length=30)
 
     def _gen_user(self):
