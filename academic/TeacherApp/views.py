@@ -26,10 +26,10 @@ def teacher_main(request):
 def courses(request):
     current_teacher = request.user.client_set.first()
     all_courses = Course.objects.filter(teacher=current_teacher)
-    study_lines = [i[0] for i in StudyLine.CHOICES if Course.objects.filter(study_line=i[0]).count() != 0]
+    study_lines = [i[0] for i in StudyLine.CHOICES if all_courses.filter(study_line=i[0]).count() != 0]
     years = []
     for st in study_lines:
-        years = years + [[i[0] for i in Year.CHOICES if Course.objects.filter(year=i[0], study_line=st).count() != 0]]
+        years = years + [[i[0] for i in Year.CHOICES if all_courses.filter(year=i[0], study_line=st).count() != 0]]
     return render(request, "TeacherApp/courses.html",
                   {"courses": all_courses, "study_lines": zip(study_lines, years), "has_permission": True})
 
