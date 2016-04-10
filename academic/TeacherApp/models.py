@@ -7,7 +7,7 @@ from StudentApp.models import Year
 
 class Course(models.Model):
     class Meta:
-        unique_together = (('name', 'teacher', 'study_line'),)
+        unique_together = (('name', 'teacher', 'study_line', 'year'),)
 
     name = models.CharField(max_length=100)
     teacher = models.ForeignKey(Teacher, null=False, default=1)
