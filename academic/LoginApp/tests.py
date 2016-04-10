@@ -1,15 +1,16 @@
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.test import TestCase
-from django.test.utils import setup_test_environment
 
 from LoginApp.models import Client, Staff, Student, Teacher, StudyLine
+from StudentApp.models import StudyGroup
 
 
 class TestUtils:
     def create_student(self):
-        st = StudyLine.INFO
-        s = Student(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
+        group = StudyGroup(number=915, study_line=StudyLine.INFO, year=1)
+        group.save()
+        s = Student(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10, group=group)
         s.save()
         return s
 
@@ -22,6 +23,7 @@ class TestUtils:
         s = Teacher(first_name="test1", last_name="test1", email="bla@bla.com")
         s.save()
         return s
+
 
 class ViewTests(TestCase):
     def test_access(self):
@@ -61,7 +63,7 @@ class ViewTests(TestCase):
 
     def test_login(self):
         stud = TestUtils().create_student()
-        response = self.client.post("/login/", {"username" : stud.user.username, "password":stud.get_temp_pass()})
+        response = self.client.post("/login/", {"username": stud.user.username, "password": stud.get_temp_pass()})
         self.assertEquals(response.status_code, 302)
         self.assertEquals(response.url, "/")
         response = self.client.get("/")
@@ -71,7 +73,7 @@ class ViewTests(TestCase):
         self.assertEquals(response.status_code, 302)
         self.assertEquals(response.url, "/change-account/")
 
-        chpass = {"username" : "myuser123", "old_password": stud.get_temp_pass(), "new_password1": "parola123parola",
+        chpass = {"username": "myuser123", "old_password": stud.get_temp_pass(), "new_password1": "parola123parola",
                   "new_password2": "parola123parola"}
         response = self.client.post("/change-account/", chpass)
         self.assertEquals(response.status_code, 200)
@@ -84,11 +86,13 @@ class ViewTests(TestCase):
         self.assertEquals(response.status_code, 200)
         stud.delete()
 
+
 class StudentMethodTests(TestCase):
     def test_user(self):
         s = TestUtils().create_student()
         self.assertEquals(s.get_user(), "tete10")
-        self.assertEquals(s.study_line, StudyLine.INFO)
+        self.assertEquals(s.group.study_line, StudyLine.INFO)
+        self.assertEquals(s.group.year, 1)
 
     def test_duplicate(self):
         tu = TestUtils()
