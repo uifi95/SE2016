@@ -46,6 +46,18 @@ class ViewTests(TestCase):
         response = c.get("/reset-pass/")
         self.assertEquals(response.status_code, 200)
 
+    def test_reset(self):
+        stud = TestUtils().create_student()
+        crtPass = stud.get_temp_pass()
+        stud.is_activated = True
+        stud.save()
+
+        response = self.client.post("/reset-pass/", {"username": stud.user.username, "email": stud.email})
+        self.assertEquals(response.status_code, 200)
+        stud.refresh_from_db()
+        self.assertFalse(stud.is_activated)
+        self.assertNotEqual(stud.get_temp_pass(), crtPass)
+        stud.delete()
 
     def test_login(self):
         stud = TestUtils().create_student()
