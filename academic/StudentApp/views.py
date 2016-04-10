@@ -22,5 +22,5 @@ def main_page(request):
 @user_passes_test(student_check, login_url=reverse_lazy('LoginApp:login'))
 def grades(request):
     current_student = request.user.client_set.first()
-    queryset = Grade.objects.all().filter(student=current_student)
+    queryset = Grade.objects.all().filter(student=current_student).order_by("course")
     return render(request, "StudentApp/grades.html", {"table": queryset, "has_permission": True})

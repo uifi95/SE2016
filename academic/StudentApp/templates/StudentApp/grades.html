@@ -9,12 +9,14 @@
     <table>
         <tr>
             <th>Course</th>
+            <th>Year</th>
             <th>Teacher</th>
             <th>Grade</th>
         </tr>
         {% for item in table %}
             <tr>
                 <td>{{ item.course }}</td>
+                <td>{{ item.course.year }}</td>
                 <td>{{ item.course.teacher }}</td>
                 <td>{{ item.value }}</td>
             </tr>
