@@ -5,8 +5,8 @@ from TeacherApp.models import Course, Grade
 
 
 class CourseAdmin(admin.ModelAdmin):
-    fields = ['name', 'teacher', 'study_line']
-    list_display = ['name', 'teacher', 'study_line']
+    fields = ['name', 'teacher', 'study_line', 'year']
+    list_display = ['name', 'teacher', 'study_line', 'year']
 
 
 class GradeAdmin(admin.ModelAdmin):

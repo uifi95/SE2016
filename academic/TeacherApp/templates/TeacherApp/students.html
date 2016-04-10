@@ -11,12 +11,14 @@
         <tr>
             <th>Name</th>
             <th>ID Number</th>
+            <th>Group</th>
             <th>Grade</th>
         </tr>
         {% for student,grade in students %}
             <tr>
                 <td id="centru">{{ student }}</td>
                 <td id="centru">{{ student.id_number }}</td>
+                <td id="centru"> {{ student.group.number }}</td>
                 <td id="centru"> {{ grade }}</td>
                 <td ><a href="{% url 'TeacherApp:edit' course_id=course_id student_id=student.id %}">
                     <button class="buton">Edit Grade</button>

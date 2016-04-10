@@ -9,9 +9,8 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User, Group
 
-
 # Create your models here.
-
+from StudentApp.models import StudyGroup, StudyLine
 
 
 class Client(models.Model):
@@ -92,18 +91,10 @@ class Staff(Client):
             self.user.save()
         super(Staff, self).save(*args, **kwargs)
 
-class StudyLine:
-    INFO = 'Informatics'
-    MATE = 'Mathematics'
-    MATE_INFO = 'Mathematics & Informatics'
-    CHOICES = [(INFO, INFO),
-               (MATE, MATE),
-               (MATE_INFO, MATE_INFO)]
-
 
 class Student(Client):
     id_number = models.IntegerField("Identification number", unique=True)
-    study_line = models.CharField(max_length=50, choices=StudyLine.CHOICES)
+    group = models.ForeignKey(StudyGroup, null=False, default=1)
 
     def _gen_user(self):
         if len(self.last_name) >= 2:

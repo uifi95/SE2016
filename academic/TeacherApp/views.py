@@ -3,6 +3,8 @@ from LoginApp.user_checks import teacher_check
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
+
+from StudentApp.models import Year
 from TeacherApp.forms import *
 
 from LoginApp.models import Student
@@ -25,8 +27,11 @@ def courses(request):
     current_teacher = request.user.client_set.first()
     all_courses = Course.objects.filter(teacher=current_teacher)
     study_lines = [i[0] for i in StudyLine.CHOICES if Course.objects.filter(study_line=i[0]).count() != 0]
+    years = []
+    for st in study_lines:
+        years = years + [[i[0] for i in Year.CHOICES if Course.objects.filter(year=i[0], study_line=st).count() != 0]]
     return render(request, "TeacherApp/courses.html",
-                  {"courses": all_courses, "study_lines": study_lines, "has_permission": True})
+                  {"courses": all_courses, "study_lines": zip(study_lines, years), "has_permission": True})
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -34,7 +39,7 @@ def courses(request):
 def students(request, course_id):
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('first_name', 'last_name')
-    all_students = Student.objects.filter(study_line=course.study_line).order_by(*args)
+    all_students = Student.objects.filter(group__study_line=course.study_line, group__year=course.year).order_by(*args)
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
               Grade.objects.filter(student__in=all_students, course=course).order_by(*args)]
@@ -67,7 +72,7 @@ def edit(request, course_id, student_id, grade_exists=None):
         return students(request, course_id)
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('first_name', 'last_name')
-    all_students = Student.objects.filter(study_line=course.study_line).order_by(*args)
+    all_students = Student.objects.filter(group__study_line=course.study_line, group__year=course.year).order_by(*args)
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
               Grade.objects.filter(student__in=all_students, course=course).order_by(*args)]

@@ -6,17 +6,21 @@
 {% block breadcrumbs %}{% endblock %}
 
 {% block content %}
-    {% for line in study_lines %}
+    {% for line, years in study_lines %}
         <h1>{{ line }}</h1>
-        <table>
-            {% for course in courses %}
-                {% if course.study_line == line %}
-                    <tr>
-                        <td><a href="{% url 'TeacherApp:students' course.id %}">{{ course.name }}</a></td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-        </table>
+        {% for year in years %}
+            <h2>Study Year {{year}}</h2>
+            <table>
+                {% for course in courses %}
+                    {% if course.study_line == line and course.year == year%}
+                        <tr>
+                            <td><a href="{% url 'TeacherApp:students' course.id %}">{{ course.name }}</a></td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+
+            </table>
+        {% endfor %}
         <p></p>
     {% endfor %}
 

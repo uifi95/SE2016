@@ -2,14 +2,17 @@ from django.db import models
 
 # Create your models here.
 from LoginApp.models import Teacher, Student, StudyLine
+from StudentApp.models import Year
 
 
 class Course(models.Model):
     class Meta:
         unique_together = (('name', 'teacher', 'study_line'),)
+
     name = models.CharField(max_length=100)
     teacher = models.ForeignKey(Teacher, null=False, default=1)
     study_line = models.CharField(max_length=50, choices=StudyLine.CHOICES)
+    year = models.IntegerField("Year", choices=Year.CHOICES, default=1)
 
     def __str__(self):
         return self.name
