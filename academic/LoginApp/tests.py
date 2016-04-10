@@ -1,4 +1,3 @@
-from django import test
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.test import TestCase
@@ -26,8 +25,7 @@ class TestUtils:
 
 class ViewTests(TestCase):
     def test_access(self):
-        setup_test_environment()
-        c = test.Client()
+        c = self.client
         response = c.get("/")
         self.assertEquals(response.status_code, 302)
         self.assertEquals(response.url, '/login/?next=/')
@@ -47,6 +45,32 @@ class ViewTests(TestCase):
         self.assertEquals(response.status_code, 302)
         response = c.get("/reset-pass/")
         self.assertEquals(response.status_code, 200)
+
+
+    def test_login(self):
+        stud = TestUtils().create_student()
+        response = self.client.post("/login/", {"username" : stud.user.username, "password":stud.get_temp_pass()})
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, "/")
+        response = self.client.get("/")
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, "/student/")
+        response = self.client.get("/student/")
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, "/change-account/")
+
+        chpass = {"username" : "myuser123", "old_password": stud.get_temp_pass(), "new_password1": "parola123parola",
+                  "new_password2": "parola123parola"}
+        response = self.client.post("/change-account/", chpass)
+        self.assertEquals(response.status_code, 200)
+        stud.refresh_from_db()
+        stud.user.refresh_from_db()
+        self.assertEquals(stud.user.username, "myuser123")
+        self.assertTrue(stud.is_activated)
+
+        response = self.client.get("/student/")
+        self.assertEquals(response.status_code, 200)
+        stud.delete()
 
 class StudentMethodTests(TestCase):
     def test_user(self):
