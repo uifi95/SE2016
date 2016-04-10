@@ -98,16 +98,18 @@ class Staff(Client):
             self.user.save()
         super(Staff, self).save(*args, **kwargs)
 
-
-class Student(Client):
+class StudyLine:
     INFO = 'Informatics'
     MATE = 'Mathematics'
     MATE_INFO = 'Mathematics & Informatics'
     CHOICES = [(INFO, INFO),
                (MATE, MATE),
                (MATE_INFO, MATE_INFO)]
+
+
+class Student(Client):
     id_number = models.IntegerField("Identification number", unique=True)
-    study_line = models.CharField(max_length=50, choices=CHOICES)
+    study_line = models.CharField(max_length=50, choices=StudyLine.CHOICES)
 
     def _gen_user(self):
         if len(self.last_name) >= 2:

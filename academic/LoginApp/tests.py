@@ -1,25 +1,30 @@
+from django import test
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.test import TestCase
-from LoginApp.models import Client, Staff, Student, Teacher
+from django.test.utils import setup_test_environment
+
+from LoginApp.models import Client, Staff, Student, Teacher, StudyLine
 
 
-# Create your tests here.
-from StudentApp.models import StudyLine
+class ViewTests(TestCase):
+    def test_main(self):
+        setup_test_environment()
+        c = test.Client()
+        response = c.get("/")
+        self.assertEquals(response.status_code, 302)
 
 
 class StudentMethodTests(TestCase):
     def test_user(self):
-        st = StudyLine(name="info")
-        st.save()
+        st = StudyLine.INFO
         s = Student(first_name="Test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
         s.save()
         self.assertEquals(s.get_user(), "tete10")
-        self.assertEquals(s.study_line.name, "info")
+        self.assertEquals(s.study_line, st)
 
     def test_duplicate(self):
-        st = StudyLine(name="info")
-        st.save()
+        st = StudyLine.MATE
         s = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
         s.save()
         s2 = Student(first_name="test1", last_name="test1", email="bla@bla.com", id_number=10,study_line=st)
