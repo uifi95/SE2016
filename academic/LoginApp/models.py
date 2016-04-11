@@ -124,6 +124,15 @@ class Teacher(Client):
         super(Teacher, self).save(*args, **kwargs)
 
 
+class ChiefOfDepartment(Teacher):
+    department = models.CharField(max_length=50, choices=StudyLine.CHOICES, unique=True, null=True)
+
+    def save(self, *args, **kwargs):
+        super(ChiefOfDepartment, self).save(*args, **kwargs)
+        self._set_type("dchief")
+        self.user.save()
+
+
 # SIGNALS start here
 # Global flag to avoid infinite recursion
 is_in_pre_delete = False

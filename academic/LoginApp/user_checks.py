@@ -4,10 +4,18 @@ def student_check(user):
         return False
     return user.client_set.first().type == "student"
 
+
 def admin_check(user):
     return user.is_staff()
+
 
 def teacher_check(user):
     if not user.client_set.count():
         return False
     return user.client_set.first().type == "teacher"
+
+
+def dchief_check(user):
+    if not user.client_set.count():
+        return False
+    return user.groups.filter(name="dchief").exists()

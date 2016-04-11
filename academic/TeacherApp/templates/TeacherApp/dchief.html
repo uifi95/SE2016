@@ -1,0 +1,26 @@
+{% extends "TeacherApp/index.html" %}
+{% load i18n admin_static %}
+{% load staticfiles %}
+
+{% block content_title %} Academic Teaching{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+{% block content %}
+    <h1>Proposed optionals:</h1>
+    <table>
+        <tr>
+            <th>Optional name</th>
+            <th>Teacher</th>
+            <th>Year</th>
+            <th>StudyLine</th>
+        </tr>
+        {% for opt in optionals %}
+            <tr>
+                <td id="centru">{{ opt.name }}</td>
+                <td id="centru">{{ opt.teacher }}</td>
+                <td id="centru">{{ opt.year }}</td>
+                <td id="centru">{{ opt.study_line }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

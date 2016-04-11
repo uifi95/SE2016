@@ -1,5 +1,5 @@
-from LoginApp.models import Teacher, StudyLine
-from LoginApp.user_checks import teacher_check
+from LoginApp.models import Teacher, StudyLine, ChiefOfDepartment
+from LoginApp.user_checks import teacher_check, dchief_check
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
@@ -19,6 +19,13 @@ def teacher_main(request):
         return redirect("LoginApp:change_account")
     name = Teacher.objects.all().filter(user=request.user).first().last_name
     return render(request, 'TeacherApp/teacher_main.html', {"first_name": name, "has_permission": True})
+
+
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(dchief_check, login_url=reverse_lazy('LoginApp:login'))
+def dchief_page(request):
+    opt = OptionalCourse.objects.filter(study_line=ChiefOfDepartment.objects.filter(user=request.user).first().department).order_by("teacher")
+    return render(request, 'TeacherApp/dchief.html', {"optionals" : opt, "has_permission": True})
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))

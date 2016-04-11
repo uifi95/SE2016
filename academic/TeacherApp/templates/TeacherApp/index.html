@@ -13,9 +13,11 @@
 <h1 id="site-name"><a href="{% url 'TeacherApp:main' %}">Academic Teaching</a></h1>
 {% endblock %}
 
-
 {% block nav-global %}
     <a class="menu" id="menu" href="{% url 'TeacherApp:main' %}">Main Page</a>
     <a class="menu" id="menu" href="{% url 'TeacherApp:courses' %}">Courses</a>
     <a class="menu" id="menu" href="{% url 'TeacherApp:optionals' %}">Optionals</a>
+    {% if is_chief %}
+        <a class="menu" id="menu" href="{% url 'TeacherApp:dchief_page' %}">Chief</a>
+    {% endif %}
 {% endblock %}
