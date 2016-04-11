@@ -81,7 +81,7 @@ def courses(request):
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
 def students(request, course_id):
     course = get_object_or_404(Course, pk=int(course_id))
-    args = ('first_name', 'last_name')
+    args = ('group','first_name', 'last_name')
     all_students = Student.objects.filter(group__study_line=course.study_line, group__year=course.year).order_by(*args)
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
@@ -114,7 +114,7 @@ def edit(request, course_id, student_id, grade_exists=None):
         grade.save()
         return students(request, course_id)
     course = get_object_or_404(Course, pk=int(course_id))
-    args = ('first_name', 'last_name')
+    args = ('group','first_name', 'last_name')
     all_students = Student.objects.filter(group__study_line=course.study_line, group__year=course.year).order_by(*args)
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
