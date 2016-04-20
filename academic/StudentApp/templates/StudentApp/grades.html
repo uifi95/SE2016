@@ -12,6 +12,7 @@
             <th>Year</th>
             <th>Teacher</th>
             <th>Grade</th>
+            <th>Credits</th>
         </tr>
         {% for item in table %}
             <tr>
@@ -19,6 +20,7 @@
                 <td>{{ item.course.year }}</td>
                 <td>{{ item.course.teacher }}</td>
                 <td>{{ item.value }}</td>
+                <td>{{ item.course.number_credits }}</td>
             </tr>
         {% endfor %}
     </table>
