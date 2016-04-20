@@ -13,6 +13,7 @@ class Course(models.Model):
     teacher = models.ForeignKey(Teacher, null=False, default=1)
     study_line = models.CharField(max_length=50, choices=StudyLine.CHOICES)
     year = models.IntegerField("Year", choices=Year.CHOICES, default=1)
+    number_credits = models.IntegerField("Number of credits", default=6)
 
     def __str__(self):
         return self.name
@@ -43,3 +44,4 @@ class OptionalPackage(models.Model):
 
     def __str__(self):
         return "Package number: " + str(self.package_number) + " Course: " + str(self.optional)
+
