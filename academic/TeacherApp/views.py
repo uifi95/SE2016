@@ -102,21 +102,7 @@ def students(request, course_id):
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
 def edit(request, course_id, student_id, grade_exists=None):
-    if request.GET.get('edit_button'):
-        try:
-            value = int(request.GET.get('grade'))
-        except Exception:
-            return students(request, course_id)
-        student = get_object_or_404(Student, pk=int(student_id))
-        course = get_object_or_404(Course, pk=int(course_id))
-        grade_exists = Grade.objects.filter(student=student, course=course).exists()
-        if not grade_exists:
-            grade = Grade(value=value, student=student, course=course)
-        else:
-            grade = Grade.objects.filter(student=student, course=course).first()
-            grade.value = value
-        grade.save()
-        return students(request, course_id)
+    form = GradeForm()
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('group', 'first_name', 'last_name')
     all_students = Student.objects.filter(group__study_line=course.study_line, group__year=course.year).order_by(*args)
@@ -128,6 +114,26 @@ def edit(request, course_id, student_id, grade_exists=None):
         if not Grade.objects.filter(student=student, course=course).exists():
             grades = grades[:count] + [''] + grades[count:]
         count += 1
+    if request.POST:
+        form = GradeForm(data=request.POST)
+        if form.is_valid():
+            value = int(form.cleaned_data['grade'])
+            student = get_object_or_404(Student, pk=int(student_id))
+            course = get_object_or_404(Course, pk=int(course_id))
+            grade_exists = Grade.objects.filter(student=student, course=course).exists()
+            if not grade_exists:
+                grade = Grade(value=value, student=student, course=course)
+            else:
+                grade = Grade.objects.filter(student=student, course=course).first()
+                grade.value = value
+            grade.save()
+            return students(request, course_id)
+        else:
+            return render(request, "TeacherApp/edit.html",
+                          {"students": zip(all_students, grades), 'form': form, "student_id": int(student_id),
+                           "course_id": course_id,
+                           "has_permission": True})
     return render(request, "TeacherApp/edit.html",
-                  {"students": zip(all_students, grades), "student_id": int(student_id), "course_id": course_id,
+                  {"students": zip(all_students, grades), 'form': form, "student_id": int(student_id),
+                   "course_id": course_id,
                    "has_permission": True})
