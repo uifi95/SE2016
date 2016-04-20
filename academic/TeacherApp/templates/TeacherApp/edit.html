@@ -7,12 +7,26 @@
 
 {% block content %}
     <h1 id="studalign">Students</h1>
+    {% if form.errors and not form.non_field_errors %}
+        <p class="errornote">
+            {% if form.errors.items|length == 1 %} "Please correct the error below."{% else %}"Please correct the errors
+                below."{% endif %}
+        </p>
+    {% endif %}
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <p class="errornote">
+                {{ error }}
+            </p>
+        {% endfor %}
+    {% endif %}
     <table id="studtbl">
         <tr>
             <th>Name</th>
             <th>ID Number</th>
             <th>Group</th>
             <th>Grade</th>
+            <th>Action</th>
         </tr>
         {% for student,grade in students %}
             <tr>
@@ -20,12 +34,12 @@
                     <td id="centrusel">{{ student }}</td>
                     <td id="centrusel">{{ student.id_number }}</td>
                     <td id="centrusel"> {{ student.group.number }}</td>
-                    <form>
+                    <form action="{{ app_path }}" method="post" id="grade-form">{% csrf_token %}
                         <td id="centru">
-                            <input type="text" name="grade" size="1" title="grade"/>
+                            {{ form.grade }}
                         </td>
                         <td>
-                            <input type="submit" value="Finish Editing" name="edit_button">
+                            <input style="width:108px" type="submit" value="Finish Editing" name="edit_button">
                         </td>
                     </form>
                 {% else %}

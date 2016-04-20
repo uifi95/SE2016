@@ -4,6 +4,10 @@ table {
 #studalign{
     margin-left: 40%;
 }
+
+#grade{
+    width: 20px !important;
+}
 #studtbl {
 
     width: 60%;
