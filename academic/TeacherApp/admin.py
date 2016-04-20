@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from TeacherApp.models import Course, Grade, OptionalCourse
+from TeacherApp.models import Course, Grade, OptionalCourse, OptionalPackage
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -21,8 +21,14 @@ class GradeAdmin(admin.ModelAdmin):
     fields = ['value', 'student', 'course']
     list_display = ['value', 'student', 'course']
 
+class OptionalPackageAdmin(admin.ModelAdmin):
+    fields = ['package_number','optional']
+    list_display = ['package_number','optional']
+
 
 admin.site.register(Course, CourseAdmin)
 admin.site.register(OptionalCourse, OptionalCourseAdmin)
 admin.site.register(Grade, GradeAdmin)
+admin.site.register(OptionalPackage, OptionalPackageAdmin)
+
 

@@ -32,3 +32,14 @@ class Grade(models.Model):
 
     def __str__(self):
         return str(self.value) + " " + str(self.course)
+
+
+class OptionalPackage(models.Model):
+    class Meta:
+        unique_together = (('package_number', 'optional'),)
+
+    package_number = models.IntegerField()
+    optional = models.ForeignKey(OptionalCourse, null=False)
+
+    def __str__(self):
+        return "Package number: " + str(self.package_number) + " Course: " + str(self.optional)

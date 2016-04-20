@@ -133,6 +133,7 @@ class ChiefOfDepartment(Teacher):
         self.user.save()
 
 
+
 # SIGNALS start here
 # Global flag to avoid infinite recursion
 is_in_pre_delete = False
