@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 
 from LoginApp.models import Teacher, StudyLine, ChiefOfDepartment
@@ -27,9 +26,8 @@ def teacher_main(request):
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(dchief_check, login_url=reverse_lazy('LoginApp:login'))
 def dchief_page(request):
-    opt = OptionalCourse.objects.filter(
-        study_line=ChiefOfDepartment.objects.filter(user=request.user).first().department).order_by("teacher")
-    return render(request, 'TeacherApp/dchief.html', {"optionals": opt, "has_permission": True})
+    opt = OptionalCourse.objects.filter(study_line=ChiefOfDepartment.objects.filter(user=request.user).first().department).order_by("teacher")
+    return render(request, 'TeacherApp/dchief.html', {"optionals" : opt, "has_permission": True})
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -53,7 +51,7 @@ def delete_optional(request, optional_id):
 def add_optional(request):
     current_teacher = request.user.client_set.first().teacher
     if request.POST:
-        optform = OptionalForm(user=request.user, data=request.POST)
+        optform = OptionalForm(data=request.POST)
         if optform.is_valid():
             name = optform.cleaned_data["name"]
             studyLine = optform.cleaned_data["study_line"]
@@ -64,7 +62,7 @@ def add_optional(request):
         else:
             return render(request, "TeacherApp/add_optional.html", {'form': optform})
     else:
-        newForm = OptionalForm(user=request.user)
+        newForm = OptionalForm()
         return render(request, "TeacherApp/add_optional.html", {'form': newForm})
 
 
@@ -85,7 +83,7 @@ def courses(request):
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
 def students(request, course_id):
     course = get_object_or_404(Course, pk=int(course_id))
-    args = ('group', 'first_name', 'last_name')
+    args = ('group','first_name', 'last_name')
     all_students = Student.objects.filter(group__study_line=course.study_line, group__year=course.year).order_by(*args)
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
@@ -118,7 +116,7 @@ def edit(request, course_id, student_id, grade_exists=None):
         grade.save()
         return students(request, course_id)
     course = get_object_or_404(Course, pk=int(course_id))
-    args = ('group', 'first_name', 'last_name')
+    args = ('group','first_name', 'last_name')
     all_students = Student.objects.filter(group__study_line=course.study_line, group__year=course.year).order_by(*args)
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
