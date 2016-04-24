@@ -12,7 +12,7 @@ from TeacherApp.forms import *
 
 from LoginApp.models import Student
 
-from TeacherApp.models import Grade, OptionalCourse, Course
+from TeacherApp.models import Grade, OptionalCourse, Course, OptionalPackage, PackageToOptionals
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -29,7 +29,12 @@ def teacher_main(request):
 def dchief_page(request):
     opt = OptionalCourse.objects.filter(
         study_line=ChiefOfDepartment.objects.filter(user=request.user).first().department).order_by("teacher")
-    return render(request, 'TeacherApp/dchief.html', {"optionals": opt, "has_permission": True})
+    goodOptionals = []
+    for el in opt:
+        if PackageToOptionals.objects.filter(course=el).count() == 0:
+            goodOptionals.append(el)
+    goodOptionals.sort(key=lambda x: x.teacher.first_name)
+    return render(request, 'TeacherApp/dchief.html', {"optionals": goodOptionals, "has_permission": True})
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -46,6 +51,32 @@ def delete_optional(request, optional_id):
     course = OptionalCourse.objects.filter(id=optional_id)
     course.delete()
     return redirect("TeacherApp:optionals")
+
+
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(dchief_check, login_url=reverse_lazy('LoginApp:login'))
+def create_package(request):
+    department = request.user.client_set.first().teacher.chiefofdepartment.department
+    if request.POST:
+        form = PackageForm(department=department, data=request.POST)
+        if form.is_valid():
+            picked = form.cleaned_data['courses']
+            opts = []
+            for el in picked:
+                opts.append(OptionalCourse.objects.filter(name=el).first())
+            np = OptionalPackage(name=form.cleaned_data["name"], year=opts[0].year, department=department)
+            np.save()
+            for el in opts:
+                po = PackageToOptionals(package=np, course=el)
+                po.save()
+            return redirect("TeacherApp:dchief_page")
+        else:
+            return render(request, "TeacherApp/create_package.html", {'form': form})
+
+    else:
+        newForm = PackageForm(department)
+        return render(request, "TeacherApp/create_package.html", {'form': newForm})
+
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))

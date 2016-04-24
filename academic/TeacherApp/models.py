@@ -34,14 +34,12 @@ class Grade(models.Model):
     def __str__(self):
         return str(self.value) + " " + str(self.course)
 
-
 class OptionalPackage(models.Model):
-    class Meta:
-        unique_together = (('package_number', 'optional'),)
+    name = models.CharField(max_length=30, null=True)
+    year = models.IntegerField("Year", choices=Year.CHOICES, default=1)
+    department = models.CharField(max_length=50, choices=StudyLine.CHOICES, default=StudyLine.CHOICES[0])
 
-    package_number = models.IntegerField()
-    optional = models.ForeignKey(OptionalCourse, null=False)
 
-    def __str__(self):
-        return "Package number: " + str(self.package_number) + " Course: " + str(self.optional)
-
+class PackageToOptionals(models.Model):
+    package = models.ForeignKey(OptionalPackage, on_delete=models.CASCADE)
+    course = models.OneToOneField(OptionalCourse, on_delete=models.CASCADE)

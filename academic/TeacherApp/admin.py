@@ -23,11 +23,12 @@ class GradeAdmin(admin.ModelAdmin):
 
 
 class OptionalPackageAdmin(admin.ModelAdmin):
-    fields = ['package_number', 'optional']
-    list_display = ['package_number', 'optional']
+    fields = ['name', 'year', 'department']
+    list_display = ['name', 'year', 'department']
 
 
 admin.site.register(Course, CourseAdmin)
 admin.site.register(OptionalCourse, OptionalCourseAdmin)
 admin.site.register(Grade, GradeAdmin)
-admin.site.register(OptionalPackage, OptionalPackageAdmin)
+# Not sure admin should see optional packages, at least not in this form
+#admin.site.register(OptionalPackage, OptionalPackageAdmin)
