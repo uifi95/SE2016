@@ -6,7 +6,10 @@
 
 {% block breadcrumbs %}{% endblock %}
 {% block content %}
-    <h1>Proposed optionals:</h1>
+    <a href="{% url 'TeacherApp:package_create' %}">
+        <button class="buton">Add Optional Package</button>
+    </a>
+    <h1>Proposed unassigned optionals:</h1>
     <table>
         <tr>
             <th>Optional name</th>

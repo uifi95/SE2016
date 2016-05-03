@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^optionals/add/$', views.add_optional, name='add_opt'),
     url(r'^optionals/delete/(?P<optional_id>\d+)/$', views.delete_optional, name='delete_optional'),
     url(r'^dchief/$',views.dchief_page, name='dchief_page'),
+    url(r'^dchief/add/$',views.create_package, name='package_create'),
 
 ]
