@@ -1,0 +1,30 @@
+{% extends "TeacherApp/teacher_main.html" %}
+
+{% block content_title %}
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+    {% for package,courses in packages %}
+        <h1>{{ package.name }}</h1>
+        <td><a href={% url 'TeacherApp:delete_package' package.id %}>
+            <button class="buton">Delete package
+            </button>
+        </a></td>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Teacher</th>
+                <th>Year</th>
+            </tr>
+            {% for course in courses %}
+                <tr>
+                    <td id="centru">{{ course.name }}</td>
+                    <td id="centru">{{ course.teacher }}</td>
+                    <td id="centru">{{ course.year }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+{% endblock %}

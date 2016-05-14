@@ -5,7 +5,7 @@ from LoginApp.models import Teacher
 from StudentApp.models import StudyLine, Year
 from django.forms import Form, CharField, ChoiceField, TextInput
 
-from TeacherApp.models import OptionalCourse, PackageToOptionals
+from TeacherApp.models import OptionalCourse, PackageToOptionals, OptionalPackage
 
 
 class OptionalForm(Form):
@@ -69,6 +69,11 @@ class PackageForm(Form):
         picked = self.cleaned_data["courses"]
         opts = []
         year = None
+        try:
+            if OptionalPackage.objects.filter(name=self.cleaned_data['name']).exists():
+                raise ValidationError("Package already exists.", code="package_exst")
+        except KeyError:
+            pass
         for p in picked:
             o = OptionalCourse.objects.filter(name=p).first()
             if year != None and year != o.year:

@@ -2,13 +2,10 @@
 {% load i18n admin_static %}
 {% load staticfiles %}
 
-{% block content_title %} Academic Teaching{% endblock %}
+{% block content_title %} {% endblock %}
 
 {% block breadcrumbs %}{% endblock %}
 {% block content %}
-    <a href="{% url 'TeacherApp:package_create' %}">
-        <button class="buton">Add Optional Package</button>
-    </a>
     <h1>Proposed unassigned optionals:</h1>
     <table>
         <tr>
@@ -23,7 +20,14 @@
                 <td id="centru">{{ opt.teacher }}</td>
                 <td id="centru">{{ opt.year }}</td>
                 <td id="centru">{{ opt.study_line }}</td>
+{#                <button id="centru" class="buton">Add</button>#}
             </tr>
         {% endfor %}
     </table>
+    <a href="{% url 'TeacherApp:package_create' %}">
+        <button class="buton">Add Optional Package</button>
+    </a>
+    <a href="{% url 'TeacherApp:view_packages' %}">
+        <button class="buton">View optional packages</button>
+    </a>
 {% endblock %}

@@ -34,8 +34,9 @@ class Grade(models.Model):
     def __str__(self):
         return str(self.value) + " " + str(self.course)
 
+
 class OptionalPackage(models.Model):
-    name = models.CharField(max_length=30, null=True)
+    name = models.CharField(unique=True, max_length=30, null=False, default="CO0")
     year = models.IntegerField("Year", choices=Year.CHOICES, default=1)
     department = models.CharField(max_length=50, choices=StudyLine.CHOICES, default=StudyLine.CHOICES[0])
 

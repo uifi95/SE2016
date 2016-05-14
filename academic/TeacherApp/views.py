@@ -78,6 +78,26 @@ def create_package(request):
         return render(request, "TeacherApp/create_package.html", {'form': newForm})
 
 
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(dchief_check, login_url=reverse_lazy('LoginApp:login'))
+def view_packages(request):
+    department = request.user.client_set.first().teacher.chiefofdepartment.department
+    packages = OptionalPackage.objects.filter(department=department)
+    courses = []
+    for package in packages:
+        courses.append(OptionalCourse.objects.filter(packagetooptionals__package=package))
+    return render(request, "TeacherApp/view_packages.html",
+                  {"packages": zip(packages, courses),
+                   "has_permission": True})
+
+
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
+def delete_package(request, package_id):
+    package = OptionalPackage.objects.filter(id=package_id)
+    package.delete()
+    return redirect("TeacherApp:view_packages")
+
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))

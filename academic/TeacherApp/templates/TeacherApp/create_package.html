@@ -11,11 +11,17 @@
 
 <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
     <div class="form-row">
+        {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <p class="errornote" style="width: 145px">
+                {{ error }}
+            </p>
+        {% endfor %}
+    {% endif %}
     {{ form.name.errors }}
     {{ form.name.label_tag }} {{ form.name }}
   </div>
     <div class="form-row">
-    {{ form.non_field_errors }}
     {{ form.courses.label_tag }} {{  form.courses }}
   </div>
   <div class="submit-row" id="btn">
