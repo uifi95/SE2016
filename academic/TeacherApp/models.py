@@ -44,3 +44,10 @@ class OptionalPackage(models.Model):
 class PackageToOptionals(models.Model):
     package = models.ForeignKey(OptionalPackage, on_delete=models.CASCADE)
     course = models.OneToOneField(OptionalCourse, on_delete=models.CASCADE)
+
+
+class StudentOptions(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    package = models.ForeignKey(OptionalPackage, on_delete=models.CASCADE)
+    course = models.ForeignKey(OptionalCourse, on_delete=models.CASCADE)
+    preference = models.IntegerField("Course preference")
