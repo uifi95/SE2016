@@ -188,3 +188,12 @@ def edit(request, course_id, student_id, grade_exists=None):
                   {"students": zip(all_students, grades), 'form': form, "student_id": int(student_id),
                    "course_id": course_id,
                    "has_permission": True})
+
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(dchief_check, login_url=reverse_lazy('LoginApp:login'))
+def view_allc(request):
+    department = request.user.client_set.first().teacher.chiefofdepartment.department
+    course_list = Course.objects.filter(study_line=department).order_by("teacher")
+    return render(request, "TeacherApp/viewcourses.html", {"courses":course_list, "has_permission": True})
+
+

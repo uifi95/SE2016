@@ -1,0 +1,24 @@
+{% extends "TeacherApp/index.html" %}
+{% load i18n admin_static %}
+{% load staticfiles %}
+
+{% block content_title %} {% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+{% block content %}
+    <h2>All courses:</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Teacher name</th>
+            <th>Year</th>
+        </tr>
+        {% for course in courses %}
+            <tr>
+                <td id="centru">{{ course.name }}</td>
+                <td id="centru">{{ course.teacher }}</td>
+                <td id="centru">{{ course.year }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
