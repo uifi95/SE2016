@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from django.db import models
 
 
-# Create your models here.
 
 
 class Year:
@@ -22,9 +21,11 @@ class StudyLine:
 
 
 class StudyGroup(models.Model):
-    number = models.IntegerField("Group Number", unique=True);
+    number = models.IntegerField("Group Number", unique=True)
     year = models.IntegerField("Year", choices=Year.CHOICES)
     study_line = models.CharField(max_length=50, choices=StudyLine.CHOICES)
 
     def __str__(self):
-        return "Group " + str(self.number);
+        return "Group " + str(self.number)
+
+

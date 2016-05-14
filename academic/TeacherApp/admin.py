@@ -31,4 +31,4 @@ admin.site.register(Course, CourseAdmin)
 admin.site.register(OptionalCourse, OptionalCourseAdmin)
 admin.site.register(Grade, GradeAdmin)
 # Not sure admin should see optional packages, at least not in this form
-#admin.site.register(OptionalPackage, OptionalPackageAdmin)
+admin.site.register(OptionalPackage, OptionalPackageAdmin)
