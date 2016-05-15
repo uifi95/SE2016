@@ -13,6 +13,7 @@ class Course(models.Model):
     teacher = models.ForeignKey(Teacher, null=False, default=1)
     study_line = models.CharField(max_length=50, choices=StudyLine.CHOICES)
     year = models.IntegerField("Year", choices=Year.CHOICES, default=1)
+    semester = models.IntegerField("Semester", choices=[(1,1), (2, 2)], default=1)
     number_credits = models.IntegerField("Number of credits", default=6)
 
     def __str__(self):
@@ -38,6 +39,8 @@ class Grade(models.Model):
 class OptionalPackage(models.Model):
     name = models.CharField(unique=True, max_length=30, null=False, default="CO0")
     year = models.IntegerField("Year", choices=Year.CHOICES, default=1)
+    semester = models.IntegerField("Semester", choices=[(1, 1), (2, 2)], default=1)
+    number_of_credits = models.IntegerField("Number of credits", default=4)
     department = models.CharField(max_length=50, choices=StudyLine.CHOICES, default=StudyLine.CHOICES[0])
 
 

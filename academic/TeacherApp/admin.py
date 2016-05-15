@@ -6,7 +6,7 @@ from TeacherApp.models import Course, Grade, OptionalCourse, OptionalPackage
 
 class CourseAdmin(admin.ModelAdmin):
     fields = ['name', 'teacher', 'study_line', 'year', 'number_credits']
-    list_display = ['name', 'teacher', 'study_line', 'year', 'number_credits']
+    list_display = ['name', 'teacher', 'study_line', 'year', 'semester', 'number_credits']
 
 
 class OptionalCourseAdmin(CourseAdmin):

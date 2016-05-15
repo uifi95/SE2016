@@ -12,6 +12,7 @@ class OptionalForm(Form):
     name = CharField(max_length=100)
     study_line = ChoiceField(label="Study line", choices=StudyLine.CHOICES)
     year = ChoiceField(label="Year", choices=Year.CHOICES)
+    semester = ChoiceField(label="Semester", choices=[(1, 1), (2, 2)])
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -22,7 +23,7 @@ class OptionalForm(Form):
 
         try:
             if OptionalCourse.objects.filter(name=self.cleaned_data['name'], study_line=self.cleaned_data['study_line'],
-                                             year=self.cleaned_data['year'],
+                                             year=self.cleaned_data['year'], semester=self.cleaned_data['semester'],
                                              teacher=current_teacher).exists():
                 raise ValidationError("Optional already exists.", code="opt_exst")
             if OptionalCourse.objects.filter(teacher=current_teacher).count() == 2:
@@ -48,6 +49,7 @@ class GradeForm(Form):
 
 class PackageForm(Form):
     name = forms.CharField(max_length=30, label="Package name")
+    number_of_credits = forms.IntegerField(max_value=8)
 
     def __init__(self, department, *args, **kwargs):
         opts = OptionalCourse.objects.filter(study_line=department)
@@ -68,6 +70,7 @@ class PackageForm(Form):
         picked = self.cleaned_data["courses"]
         opts = []
         year = None
+        semester = None
         try:
             if OptionalPackage.objects.filter(name=self.cleaned_data['name']).exists():
                 raise ValidationError("Package already exists.", code="package_exst")
@@ -75,8 +78,10 @@ class PackageForm(Form):
             pass
         for p in picked:
             o = OptionalCourse.objects.filter(name=p).first()
-            if year != None and year != o.year:
-                raise ValidationError("Courses from one package should belong to the same year!", code="bad_year")
+            if year != None and year != o.year or (semester != None and semester != o.semester):
+                raise ValidationError("Courses from one package should belong to the same year and semester!", code="bad_year")
+
+            semester = o.semester
             year = o.year
         super(Form, self).clean()
 

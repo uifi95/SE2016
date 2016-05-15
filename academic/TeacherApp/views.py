@@ -63,6 +63,8 @@ def create_package(request):
             for el in opts:
                 po = PackageToOptionals(package=np, course=el)
                 po.save()
+                el.number_credits = po.number_of_credits
+                el.save()
             return redirect("TeacherApp:dchief_page")
         else:
             return render(request, "TeacherApp/create_package.html", {'form': form})
@@ -103,7 +105,8 @@ def add_optional(request):
             name = optform.cleaned_data["name"]
             studyLine = optform.cleaned_data["study_line"]
             year = optform.cleaned_data["year"]
-            newOpt = OptionalCourse(name=name, study_line=studyLine, year=year, teacher=current_teacher)
+            semester = optform.cleaned_data["semester"]
+            newOpt = OptionalCourse(name=name, study_line=studyLine, year=year, teacher=current_teacher, semester=semester)
             newOpt.save()
             return redirect("TeacherApp:optionals")
         else:
