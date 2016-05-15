@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^courses/(?P<course_id>\d+)/(?P<student_id>\d+)/$', views.edit, name='edit'),
     url(r'^optionals/$', views.optionals, name='optionals'),
     url(r'^optionals/add/$', views.add_optional, name='add_opt'),
+    url(r'^view_packages/$', views.view_all_packages, name='view_all_packages'),
     url(r'^optionals/delete/(?P<optional_id>\d+)/$', views.delete_optional, name='delete_optional'),
     url(r'^dchief/$', views.dchief_page, name='dchief_page'),
     url(r'^dchief/add/$', views.create_package, name='package_create'),

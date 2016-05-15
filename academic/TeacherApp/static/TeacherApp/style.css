@@ -5,15 +5,18 @@ table {
     margin-left: 40%;
 }
 
+#butonalign {
+    position: relative;
+    margin-left: 35%;
+}
+
 #grade{
     width: 20px !important;
 }
 #studtbl {
-
     width: 60%;
     margin-left: 20%;
     margin-right: 20%;
-
 }
 
 .menu {
@@ -47,6 +50,7 @@ table {
 
 #centru {
     padding-top: 15px;
+    width: 200px;
 }
 
 #centrusel {
