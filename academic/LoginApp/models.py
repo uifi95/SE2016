@@ -4,6 +4,7 @@ import struct
 from os import urandom
 from random import shuffle
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
@@ -131,6 +132,43 @@ class ChiefOfDepartment(Teacher):
         super(ChiefOfDepartment, self).save(*args, **kwargs)
         self._set_type("dchief")
         self.user.save()
+
+class YearState:
+    SEMESTER_1 = "First Semester going on"
+    SEMESTER_2 = "Second semester going on"
+    SIGN_CONTRACTS = "Contract signing going on"
+    OPTIONAL_PROPOSAL = "Proposing optionals going on"
+    OPTIONAL_PACKAGES = "Optional package building going on"
+    CHOICHES = [(SEMESTER_1, SEMESTER_1),
+                (SEMESTER_2, SEMESTER_2),
+                (OPTIONAL_PROPOSAL, OPTIONAL_PROPOSAL),
+                (OPTIONAL_PACKAGES, OPTIONAL_PACKAGES),
+                (SIGN_CONTRACTS, SIGN_CONTRACTS)]
+
+class CurrentYearState(models.Model):
+    year = models.IntegerField("Current Year")
+    semester = models.IntegerField("Current Semester")
+    crtState = models.CharField("Current State", max_length=50, choices=YearState.CHOICHES)
+    oldState = models.CharField("Current State", max_length=50, choices=YearState.CHOICHES, null=True)
+    class Meta:
+        verbose_name_plural = 'Current year state'
+
+
+    def clean(self, *args, **kwargs):
+        if self.oldState != None:
+            crtIdx = YearState.CHOICHES.index((self.crtState, self.crtState))
+            if YearState.CHOICHES[crtIdx - 1][0] != self.oldState:
+                raise ValidationError("Invalid state transition!")
+        super(CurrentYearState, self).clean()
+
+    def full_clean(self, *args, **kwargs):
+        return self.clean(*args, **kwargs)
+
+    def save(self,  *args, **kwargs):
+        self.full_clean()
+        self.oldState = self.crtState
+        super(CurrentYearState, self).save(*args, **kwargs)
+
 
 
 
