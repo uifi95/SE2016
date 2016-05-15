@@ -1,17 +1,11 @@
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError
-
-from LoginApp.models import Teacher, StudyLine, ChiefOfDepartment
-from LoginApp.user_checks import teacher_check, dchief_check
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 
-from StudentApp.models import Year
-from TeacherApp.forms import *
-
+from LoginApp.models import ChiefOfDepartment
 from LoginApp.models import Student
-
+from LoginApp.user_checks import teacher_check, dchief_check
+from TeacherApp.forms import *
 from TeacherApp.models import Grade, OptionalCourse, Course, OptionalPackage, PackageToOptionals
 
 
@@ -189,11 +183,31 @@ def edit(request, course_id, student_id, grade_exists=None):
                    "course_id": course_id,
                    "has_permission": True})
 
+
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(dchief_check, login_url=reverse_lazy('LoginApp:login'))
-def view_allc(request):
+def view_all_courses(request):
     department = request.user.client_set.first().teacher.chiefofdepartment.department
-    course_list = Course.objects.filter(study_line=department).order_by("teacher")
-    return render(request, "TeacherApp/viewcourses.html", {"courses":course_list, "has_permission": True})
+    teachers = [("Any", "All Teachers")] + [(i.user_id, i) for i in
+                                            Teacher.objects.distinct().filter(course__study_line=department)]
+    if request.POST:
+        form = TeacherDropDownForm(options=teachers, data=request.POST)
+        if form.is_valid():
+            if form.cleaned_data["teacher"] != "Any":
+                course_list = Course.objects.filter(study_line=department,
+                                                    teacher=Teacher.objects.filter(
+                                                        user_id=form.cleaned_data["teacher"]).first())
+                return render(request, "TeacherApp/view_courses.html",
+                              {"courses": course_list, 'form': form, "has_permission": True})
+            else:
+                form = TeacherDropDownForm(options=teachers)
+                course_list = Course.objects.filter(study_line=department).order_by("teacher")
+                return render(request, "TeacherApp/view_courses.html",
+                              {"courses": course_list, 'form': form, "has_permission": True})
 
+    else:
+        form = TeacherDropDownForm(options=teachers)
 
+        course_list = Course.objects.filter(study_line=department).order_by("teacher")
+        return render(request, "TeacherApp/view_courses.html",
+                      {"courses": course_list, 'form': form, "has_permission": True})

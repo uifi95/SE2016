@@ -15,5 +15,5 @@ urlpatterns = [
     url(r'^dchief/add/$', views.create_package, name='package_create'),
     url(r'^dchief/view/$', views.view_packages, name='view_packages'),
     url(r'^dchief/delete/(?P<package_id>\d+)/$', views.delete_package, name='delete_package'),
-    url(r'^dchief/viewcourses/$', views.view_allc, name='view_allc'),
+    url(r'^dchief/viewcourses/$', views.view_all_courses, name='view_all_courses'),
 ]

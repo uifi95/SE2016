@@ -6,6 +6,12 @@
 
 {% block breadcrumbs %}{% endblock %}
 {% block content %}
+    <form action="{{ app_path }}" method="post" id="grade-form">{% csrf_token %}
+        <div class="form-row">
+            {{ form.teacher.label_tag }} {{ form.teacher }}
+            <input style="width:108px" type="submit" value="Filter" name="filter_button">
+        </div>
+    </form>
     <h2>All courses:</h2>
     <table>
         <tr>

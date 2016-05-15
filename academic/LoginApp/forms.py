@@ -8,9 +8,11 @@ class LoginForm(Form):
     username = CharField(label="Username:", max_length=30)
     password = CharField(label="Password:", widget=PasswordInput())
 
+
 class ResetPasswordForm(Form):
     username = CharField(label="Username:", max_length=30)
-    email = EmailField(label="Email:", widget=TextInput(attrs={'id':'lbl'}))
+    email = EmailField(label="Email:", widget=TextInput(attrs={'id': 'lbl'}))
+
 
 class CustomizeAccountForm(PasswordChangeForm):
     username = CharField(label="Username:", max_length=30)

@@ -46,8 +46,6 @@ class GradeForm(Form):
         super(Form, self).clean()
 
 
-
-
 class PackageForm(Form):
     name = forms.CharField(max_length=30, label="Package name")
 
@@ -59,11 +57,12 @@ class PackageForm(Form):
                 self.opts.append(opt)
         ropts = []
         for opt in self.opts:
-            choiceVal = opt.name + " Teacher: " + opt.teacher.first_name + " " + opt.teacher.last_name +  " An: " + str(opt.year)
+            choiceVal = opt.name + " Teacher: " + opt.teacher.first_name + " " + opt.teacher.last_name + " An: " + str(
+                opt.year)
             ropts.append((opt, choiceVal))
         super(Form, self).__init__(*args, **kwargs)
         self.fields['courses'] = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
-                                         choices=ropts, label="Optionals:")
+                                                           choices=ropts, label="Optionals:")
 
     def clean(self):
         picked = self.cleaned_data["courses"]
@@ -80,3 +79,13 @@ class PackageForm(Form):
                 raise ValidationError("Courses from one package should belong to the same year!", code="bad_year")
             year = o.year
         super(Form, self).clean()
+
+
+class TeacherDropDownForm(Form):
+    def __init__(self, options, *args, **kwargs):
+        super(Form, self).__init__(*args, **kwargs)
+        self.fields['teacher'] = forms.ChoiceField(widget=forms.Select,
+                                                   choices=options, label="Teacher name:")
+
+        def clean(self):
+            super(Form, self).clean()
