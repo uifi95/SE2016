@@ -84,6 +84,16 @@ def view_packages(request):
                   {"packages": zip(packages, courses),
                    "has_permission": True})
 
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
+def view_all_packages(request):
+    packages = OptionalPackage.objects.all()
+    courses = []
+    for package in packages:
+        courses.append(OptionalCourse.objects.filter(packagetooptionals__package=package))
+    return render(request, "TeacherApp/view_all_packages.html",
+                  {"packages": zip(packages, courses),
+                   "has_permission": True})
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))

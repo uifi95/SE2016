@@ -17,6 +17,7 @@
     <a class="menu" id="menu" href="{% url 'TeacherApp:main' %}">Main Page</a>
     <a class="menu" id="menu" href="{% url 'TeacherApp:courses' %}">Courses</a>
     <a class="menu" id="menu" href="{% url 'TeacherApp:optionals' %}">Optionals</a>
+    <a class="menu" id="menu" href="{% url 'TeacherApp:view_all_packages' %}">Packages</a>
     {% if is_chief %}
         <a class="menu" id="menu" href="{% url 'TeacherApp:dchief_page' %}">Chief</a>
     {% endif %}
