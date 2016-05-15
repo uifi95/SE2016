@@ -3,8 +3,8 @@ from .models import Student, Staff, Teacher, ChiefOfDepartment, CurrentYearState
 
 
 class StudentAdmin(admin.ModelAdmin):
-    fields = ['first_name', 'last_name', 'id_number', 'email', 'group']
-    list_display = ['get_user', 'last_name', 'first_name', 'group', 'email', 'is_activated',
+    fields = ['first_name', 'last_name', 'id_number', 'email', 'group', 'is_enrolled']
+    list_display = ['is_enrolled', 'get_user', 'last_name', 'first_name', 'group', 'email', 'is_activated',
                     'get_temp_pass']
 
 

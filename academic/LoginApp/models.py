@@ -96,6 +96,7 @@ class Staff(Client):
 class Student(Client):
     id_number = models.IntegerField("Identification number", unique=True)
     group = models.ForeignKey(StudyGroup, null=False, default=1)
+    is_enrolled = models.BooleanField("Currently enrolled", default=True)
 
     def _gen_user(self):
         if len(self.last_name) >= 2:
@@ -152,7 +153,6 @@ class CurrentYearState(models.Model):
     oldState = models.CharField("Current State", max_length=50, choices=YearState.CHOICHES, null=True)
     class Meta:
         verbose_name_plural = 'Current year state'
-
 
     def clean(self, *args, **kwargs):
         if self.oldState != None:
