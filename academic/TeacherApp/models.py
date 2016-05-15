@@ -68,4 +68,4 @@ class StudentOptions(models.Model):
 class StudentAssignedCourses(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    year = models.IntegerField(choices=Year.CHOICES)
+    year = models.IntegerField("Academic year")

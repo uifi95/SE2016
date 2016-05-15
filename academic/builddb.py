@@ -9,11 +9,11 @@ os.environ['DJANGO_SETTINGS_MODULE'] = "academic.settings"
 django.setup()
 
 from django.contrib.auth.models import User
-from TeacherApp.models import Grade, Course
+from TeacherApp.models import Grade, Course, PackageToOptionals, StudentOptions, StudentAssignedCourses, OptionalPackage
 from StudentApp.models import StudyGroup, StudyLine, Year
 from django.db.utils import IntegrityError
 
-from LoginApp.models import Client, Student, Teacher, Staff
+from LoginApp.models import Client, Student, Teacher, Staff, CurrentYearState, YearState
 
 
 def delete_all(elem_set):
@@ -21,6 +21,11 @@ def delete_all(elem_set):
         el.delete()
 
 def cleanDB():
+    delete_all(CurrentYearState.objects.all())
+    delete_all(OptionalPackage.objects.all())
+    delete_all(PackageToOptionals.objects.all())
+    delete_all(StudentOptions.objects.all())
+    delete_all(StudentAssignedCourses.objects.all())
     delete_all(Client.objects.all())
     delete_all(Grade.objects.all())
     delete_all(StudyGroup.objects.all())
@@ -36,6 +41,9 @@ if __name__ == "__main__":
                  "Pan", "Cornea"]
     print("Cleaning up db...")
     cleanDB()
+    print ("Creating year state...")
+    yearState = CurrentYearState(year=2014, semester=1, crtState=YearState.OPTIONAL_PROPOSAL)
+    yearState.save()
     print ("Creating groups...")
     groups = []
     for i in range(9):
@@ -82,15 +90,18 @@ if __name__ == "__main__":
     t.save()
 
     cnames = ["Object oriented programming", "Software Engineering", "Web programming", "Artificial Intelligence",
-              "English", "Dynamic Systems"]
+              "English", "Dynamic Systems", "Cryptography", "Databases"]
     courses = []
-    print("Creating 6 courses")
-    for i in range(6):
-        c = Course(name=cnames[i], teacher=random.choice(teacherList), study_line=random.choice(StudyLine.CHOICES)[1],
-                   year=random.choice(Year.CHOICES)[1])
+    print("Creating 200 courses")
+    for i in range(200):
+        name = cnames[i % len(cnames)] + " Version " + str(i)
+        c = Course(name=name, teacher=random.choice(teacherList), study_line=random.choice(StudyLine.CHOICES)[1],
+                   year=random.choice(Year.CHOICES)[1], semester=random.choice([1,2]), number_credits=8)
         c.save()
         courses.append(c)
 
+    # Grades happen after preferences and assignment
+    """
     print("Generating at most 50 grades")
     grades = []
     for i in range(50):
@@ -105,6 +116,7 @@ if __name__ == "__main__":
         except IntegrityError:
             continue
         grades.append(g)
+    """
 
     with open("dbinfo.txt", "w") as f:
         f.write("Activated users with password parolaparola:\n")
