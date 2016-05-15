@@ -2,11 +2,11 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 
-from LoginApp.models import ChiefOfDepartment
+from LoginApp.models import ChiefOfDepartment, CurrentYearState
 from LoginApp.models import Student
 from LoginApp.user_checks import teacher_check, dchief_check
 from TeacherApp.forms import *
-from TeacherApp.models import Grade, OptionalCourse, Course, OptionalPackage, PackageToOptionals
+from TeacherApp.models import Grade, OptionalCourse, Course, OptionalPackage, PackageToOptionals, StudentAssignedCourses
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -134,7 +134,8 @@ def courses(request):
 def students(request, course_id):
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('group', 'first_name', 'last_name')
-    all_students = Student.objects.filter(group__study_line=course.study_line, group__year=course.year).order_by(*args)
+    all_students = StudentAssignedCourses.objects.filter(course=course)
+    all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
               Grade.objects.filter(student__in=all_students, course=course).order_by(*args)]
@@ -153,7 +154,9 @@ def edit(request, course_id, student_id, grade_exists=None):
     form = GradeForm()
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('group', 'first_name', 'last_name')
-    all_students = Student.objects.filter(group__study_line=course.study_line, group__year=course.year).order_by(*args)
+    all_students = StudentAssignedCourses.objects.filter(course=course)
+    all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
+
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
               Grade.objects.filter(student__in=all_students, course=course).order_by(*args)]
@@ -191,26 +194,31 @@ def edit(request, course_id, student_id, grade_exists=None):
 @user_passes_test(dchief_check, login_url=reverse_lazy('LoginApp:login'))
 def view_all_courses(request):
     department = request.user.client_set.first().teacher.chiefofdepartment.department
+    crtYear = CurrentYearState.objects.first().year
+    crtSemester = CurrentYearState.objects.first().semester
     teachers = [("Any", "All Teachers")] + [(i.user_id, i) for i in
-                                            Teacher.objects.distinct().filter(course__study_line=department)]
+                                            Teacher.objects.distinct().filter(course__study_line=department, course__academic_year= crtYear,
+                                                                              course__semester= crtSemester)]
     if request.POST:
         form = TeacherDropDownForm(options=teachers, data=request.POST)
         if form.is_valid():
             if form.cleaned_data["teacher"] != "Any":
                 course_list = Course.objects.filter(study_line=department,
                                                     teacher=Teacher.objects.filter(
-                                                        user_id=form.cleaned_data["teacher"]).first())
+                                                    user_id=form.cleaned_data["teacher"]).first(),
+                                                    year=crtYear,
+                                                    semester=crtSemester)
                 return render(request, "TeacherApp/view_courses.html",
                               {"courses": course_list, 'form': form, "has_permission": True})
             else:
                 form = TeacherDropDownForm(options=teachers)
-                course_list = Course.objects.filter(study_line=department).order_by("teacher")
+                course_list = Course.objects.filter(study_line=department, year=crtYear, semester=crtSemester).order_by("teacher")
                 return render(request, "TeacherApp/view_courses.html",
                               {"courses": course_list, 'form': form, "has_permission": True})
 
     else:
         form = TeacherDropDownForm(options=teachers)
 
-        course_list = Course.objects.filter(study_line=department).order_by("teacher")
+        course_list = Course.objects.filter(study_line=department, year=crtYear, semester=crtSemester).order_by("teacher")
         return render(request, "TeacherApp/view_courses.html",
                       {"courses": course_list, 'form': form, "has_permission": True})

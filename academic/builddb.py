@@ -15,25 +15,23 @@ from django.db.utils import IntegrityError
 
 from LoginApp.models import Client, Student, Teacher, Staff, CurrentYearState, YearState
 
-
-def delete_all(elem_set):
-    for el in elem_set:
-        el.delete()
+def delete_all(bla):
+    pass
 
 def cleanDB():
-    delete_all(CurrentYearState.objects.all())
-    delete_all(OptionalPackage.objects.all())
-    delete_all(PackageToOptionals.objects.all())
-    delete_all(StudentOptions.objects.all())
-    delete_all(StudentAssignedCourses.objects.all())
-    delete_all(Client.objects.all())
-    delete_all(Grade.objects.all())
-    delete_all(StudyGroup.objects.all())
-    delete_all(Course.objects.all())
-    delete_all(Student.objects.all())
-    delete_all(Teacher.objects.all())
-    delete_all(Staff.objects.all())
-    delete_all(User.objects.all())
+    delete_all(CurrentYearState.objects.all().delete())
+    delete_all(OptionalPackage.objects.all().delete())
+    delete_all(PackageToOptionals.objects.all().delete())
+    delete_all(StudentOptions.objects.all().delete())
+    delete_all(StudentAssignedCourses.objects.all().delete())
+    delete_all(Client.objects.all().delete())
+    delete_all(Grade.objects.all().delete())
+    delete_all(StudyGroup.objects.all().delete())
+    delete_all(Course.objects.all().delete())
+    delete_all(Student.objects.all().delete())
+    delete_all(Teacher.objects.all().delete())
+    delete_all(Staff.objects.all().delete())
+    delete_all(User.objects.all().delete())
 
 if __name__ == "__main__":
     firstNames = ["Emil", "Ion", "Cornel", "Maria", "Vasile", "Bogdan", "Ana", "Laura", "Melisa", "Sergiu", "Ionut"]
