@@ -166,7 +166,13 @@ class CurrentYearState(models.Model):
 
     def save(self,  *args, **kwargs):
         self.full_clean()
+        if self.oldState == YearState.SEMESTER_2:
+            self.year += 1
+            self.semester = 1
+        if self.oldState == YearState.SEMESTER_1:
+            self.semester += 1
         self.oldState = self.crtState
+
         super(CurrentYearState, self).save(*args, **kwargs)
 
 
