@@ -172,7 +172,8 @@ class CurrentYearState(models.Model):
                         courses = Course.objects.filter(academic_year=self.year, year=checkYear, semester=semester,
                                                         study_line=study_line[0])
                         for c in courses:
-                            if isinstance(c, OptionalCourse):
+                            if OptionalCourse.objects.filter(name=c.name, teacher=c.teacher, year=c.year, academic_year=c.academic_year).count() != 0:
+                                print("Found optional")
                                 continue
                             creditCount += c.number_credits
                         optionals = OptionalPackage.objects.filter(academic_year=self.year, year=checkYear,
@@ -193,7 +194,8 @@ class CurrentYearState(models.Model):
                     courses = Course.objects.filter(academic_year=self.year, year=st.group.year, semester=semester,
                                                     study_line=st.group.study_line)
                     for c in courses:
-                        if isinstance(c, OptionalCourse):
+                        if OptionalCourse.objects.filter(name=c.name, teacher=c.teacher, year=c.year, academic_year=c.academic_year).count() != 0:
+                            print("Found optional")
                             continue
                         nas = StudentAssignedCourses(student=st, course=c, year=self.year)
                         nas.save()
@@ -233,6 +235,7 @@ class CurrentYearState(models.Model):
                     for pr in prefs:
                         if pr.preference == 1 and numberOfPreferences[pr.course] >= 20:
                             # all good here
+                            print("Added first pref")
                             nas = StudentAssignedCourses(student=st, course=pr.course, year=self.year)
                             nas.save()
                             is_good = True
@@ -241,6 +244,7 @@ class CurrentYearState(models.Model):
                         sp = sorted(prefs, key=lambda x: x.preference)
                         for pref in sp:
                             if pref.course in numberOfPreferences.keys() and numberOfPreferences[pref.course] >= 20:
+                                print("Added second pref")
                                 nas = StudentAssignedCourses(student=st, course=pref.course, year=self.year)
                                 nas.save()
                                 is_good = True
@@ -250,6 +254,7 @@ class CurrentYearState(models.Model):
                         # assign to first course with enough people if any
                         for el in numberOfPreferences.keys():
                             if numberOfPreferences[el] >= 20:
+                                print("Added 3rd scenario")
                                 nas = StudentAssignedCourses(student=st, course=el, year=self.year)
                                 nas.save()
                                 is_good = True
@@ -258,6 +263,7 @@ class CurrentYearState(models.Model):
                     # if still not good, assign to first course in the package
                     if not is_good:
                         from TeacherApp.models import PackageToOptionals
+                        print("added last scenario")
                         course = PackageToOptionals.objects.filter(package=p).first().course
                         nas = StudentAssignedCourses(student=st, course=course, year=self.year)
                         nas.save()
