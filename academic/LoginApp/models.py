@@ -152,7 +152,7 @@ class CurrentYearState(models.Model):
     year = models.IntegerField("Current Year")
     semester = models.IntegerField("Current Semester")
     crtState = models.CharField("Current State", max_length=50, choices=YearState.CHOICHES)
-    oldState = models.CharField("Current State", max_length=50, choices=YearState.CHOICHES, null=True)
+    oldState = models.CharField("Old State", max_length=50, choices=YearState.CHOICHES, null=True)
 
     class Meta:
         verbose_name_plural = 'Current year state'
@@ -288,7 +288,6 @@ class CurrentYearState(models.Model):
                         ng = ng.first()
                     st.group = ng
                     st.save()
-
             self.year += 1
             self.semester = 1
             # generate next year courses
@@ -305,7 +304,7 @@ class CurrentYearState(models.Model):
             self.semester += 1
 
     def clean(self, *args, **kwargs):
-        if self.oldState != None:
+        if self.oldState is not None:
             crtIdx = YearState.CHOICHES.index((self.crtState, self.crtState))
             if YearState.CHOICHES[crtIdx - 1][0] != self.oldState:
                 raise ValidationError("Invalid state transition!")
