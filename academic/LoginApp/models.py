@@ -201,7 +201,8 @@ class CurrentYearState(models.Model):
                     # now assign courses not passed in previous years
                     stcourses = StudentAssignedCourses.objects.filter(student=st, course__semester=semester).exclude(
                         course__year=st.group.year)
-                    for c in stcourses:
+                    for sc in stcourses:
+                        c = sc.course
                         grade = Grade.objects.filter(student=st, course=c)
                         if grade.count() == 0 or grade.first().value() < 5:
                             newCourse = Course.objects.filter(academic_year=self.year, semester=semester, name=c.name,
