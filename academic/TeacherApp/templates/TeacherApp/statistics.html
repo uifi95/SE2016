@@ -1,0 +1,21 @@
+{% extends "TeacherApp/index.html" %}
+{% load i18n admin_static %}
+{% load staticfiles %}
+
+{% block content_title %} {% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+{% block content %}
+    <p>
+    Best teacher : {{ best_teacher }}
+    </p>
+    <p>
+    Worst teacher : {{ worst_teacher }}
+    </p>
+    <p>
+    Best discipline : {{ best_discipline }}
+    </p>
+    <p>
+    Worst discipline : {{ worst_discipline }}
+    </p>
+{% endblock %}

@@ -1,3 +1,5 @@
+from statistics import mean
+
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
@@ -252,3 +254,40 @@ def view_all_courses(request):
                                             semester=crtSemester).order_by("teacher")
         return render(request, "TeacherApp/view_courses.html",
                       {"courses": all_courses, 'form': form, "has_permission": True})
+
+
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(dchief_check, login_url=reverse_lazy('LoginApp:login'))
+def statistics(request):
+    department = request.user.client_set.first().teacher.chiefofdepartment.department
+    best_teacher = max(Teacher.objects.filter(course__study_line=department),key=return_best_teacher)
+    worst_teacher =min(Teacher.objects.filter(course__study_line=department),key=return_worst_teacher)
+    best_discipline = max(Course.objects.filter(study_line=department),key=return_best_discipline)
+    worst_discipline = min(Course.objects.filter(study_line=department),key=return_worst_discipline)
+    return render(request, "TeacherApp/statistics.html",{"best_teacher":best_teacher,"worst_teacher":worst_teacher,
+                                                         "best_discipline":best_discipline,"worst_discipline":worst_discipline,"has_permission":True})
+
+#helper functions
+def return_best_teacher(teacher):
+    if Grade.objects.filter(course__teacher=teacher):
+        return mean([i.value for i in Grade.objects.filter(course__teacher=teacher)])
+    else:
+        return 0
+
+
+def return_worst_teacher(teacher):
+    if Grade.objects.filter(course__teacher=teacher):
+        return mean([i.value for i in Grade.objects.filter(course__teacher=teacher)])
+    else:
+        return 10
+
+def return_best_discipline(discipline):
+    if Grade.objects.filter(course=discipline):
+        return mean([i.value for i in Grade.objects.filter(course=discipline)])
+    else:
+        return 0
+def return_worst_discipline(discipline):
+    if Grade.objects.filter(course=discipline):
+        return mean([i.value for i in Grade.objects.filter(course=discipline)])
+    else:
+        return 10
