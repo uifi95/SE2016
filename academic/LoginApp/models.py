@@ -316,9 +316,7 @@ class CurrentYearState(models.Model):
         return self.clean(*args, **kwargs)
 
     def save(self, *args, **kwargs):
-        self.full_clean()
         self.oldState = self.crtState
-
         super(CurrentYearState, self).save(*args, **kwargs)
 
 
