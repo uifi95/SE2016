@@ -104,10 +104,15 @@ def student_by_year(modeladmin, request, queryset):
 student_by_year.short_description = "PDF students from each year"
 
 
+def student_by_interval(modeladmin, request, queryset):
+    return redirect("StudentApp:interval")
+
+student_by_interval.short_description = "PDF students by interval"
+
 class GroupAdmin(admin.ModelAdmin):
     fields = ['number', 'year', 'study_line']
     list_display = ['number', 'year', 'study_line']
-    actions = [student_by_groups, student_by_year]
+    actions = [student_by_groups, student_by_year, student_by_interval]
 
 
 admin.site.register(StudyGroup, GroupAdmin)

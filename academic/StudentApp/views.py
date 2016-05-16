@@ -1,3 +1,5 @@
+from statistics import mean
+
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
@@ -11,8 +13,9 @@ from reportlab.platypus.para import Paragraph
 
 from LoginApp.models import Student
 from LoginApp.user_checks import student_check, admin_check
-from StudentApp.forms import SelectOptionals
-from StudentApp.models import StudyGroup
+from StudentApp.admin import return_grade
+from StudentApp.forms import SelectOptionals, SelectInterval
+from StudentApp.models import StudyGroup, Year
 from TeacherApp.models import Grade, PackageToOptionals, OptionalPackage, OptionalCourse, StudentOptions, \
     StudentAssignedCourses
 
@@ -68,3 +71,52 @@ def study_contract(request):
         form = SelectOptionals(student, student.group.year)
         return render(request, "StudentApp/study_contracts.html", {'form': form, "has_permission": True})
 
+
+@login_required(login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(admin_check, login_url=reverse_lazy('LoginApp:login'))
+def interval(request):
+    if request.POST:
+        form = SelectInterval(data=request.POST)
+        if form.is_valid():
+            leftval = int(form.cleaned_data['leftInterval'])
+            rightval = int(form.cleaned_data['rightInterval'])
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="StudentsByInterval.pdf"'
+
+            p = canvas.Canvas(response)
+            p.setFont("Times-Roman", 20)
+            p.drawString(70, 765, "Students ordered by professional results from each year ")
+            xx = 700
+            c = 0
+            p.setFont("Times-Roman", 15)
+            p.drawString(102, xx, "Interval: " + "(" + str(leftval) + ", " + str(rightval) + ")")
+            xx = xx - 30
+            l = []
+            for student in Student.objects.all():
+                courses = [i.course for i in StudentAssignedCourses.objects.filter(student=student)]
+                medie = mean([return_grade(course, student) for course in courses])
+                student_detail = []
+                student_detail.append(student.first_name)
+                student_detail.append(student.last_name)
+                student_detail.append(round(medie, 2))
+                l.append(student_detail)
+            ordonata = sorted(l, key=lambda x: x[2], reverse=True)
+            for student in ordonata:
+                if student[2] > leftval and student[2] < rightval:
+                    p.setFont("Times-Roman", 12)
+                    p.drawString(80, xx, student[0] + " " + student[1] + " " + str(student[2]))
+                    c = c + 1
+                    if c > 15:
+                        p.showPage()
+                        c = 0
+                        xx = 700
+                    xx = xx - 30
+            xx = xx - 20
+            p.showPage()
+            p.save()
+            return response
+        else:
+            return render(request, "StudentApp/interval.html", {'form': form, "has_permission": True})
+    else:
+        form = SelectInterval()
+        return render(request, "StudentApp/interval.html", {'form': form, "has_permission": True})
