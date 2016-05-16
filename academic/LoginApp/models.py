@@ -134,6 +134,7 @@ class ChiefOfDepartment(Teacher):
         self._set_type("dchief")
         self.user.save()
 
+
 class YearState:
     SEMESTER_1 = "First Semester going on"
     SEMESTER_2 = "Second semester going on"
@@ -146,32 +147,36 @@ class YearState:
                 (OPTIONAL_PACKAGES, OPTIONAL_PACKAGES),
                 (SIGN_CONTRACTS, SIGN_CONTRACTS)]
 
+
 class CurrentYearState(models.Model):
     year = models.IntegerField("Current Year")
     semester = models.IntegerField("Current Semester")
     crtState = models.CharField("Current State", max_length=50, choices=YearState.CHOICHES)
     oldState = models.CharField("Current State", max_length=50, choices=YearState.CHOICHES, null=True)
+
     class Meta:
         verbose_name_plural = 'Current year state'
 
     def execute_transition(self):
         # Check credit counts work
-        from TeacherApp.models import OptionalCourse,Course, OptionalPackage
+        from TeacherApp.models import OptionalCourse, Course, OptionalPackage
         from TeacherApp.models import StudentAssignedCourses, StudentOptions
         from TeacherApp.models import Grade
 
         if self.oldState == YearState.OPTIONAL_PACKAGES:
             for year in Year.CHOICES:
-                for semester in [1,2]:
+                for semester in [1, 2]:
                     for study_line in StudyLine.CHOICES:
                         checkYear = year[0]
                         creditCount = 0
-                        courses = Course.objects.filter(academic_year=self.year, year=checkYear, semester=semester, study_line=study_line[0])
+                        courses = Course.objects.filter(academic_year=self.year, year=checkYear, semester=semester,
+                                                        study_line=study_line[0])
                         for c in courses:
                             if isinstance(c, OptionalCourse):
                                 continue
                             creditCount += c.number_credits
-                        optionals = OptionalPackage.objects.filter(academic_year=self.year, year= checkYear, semester=semester)
+                        optionals = OptionalPackage.objects.filter(academic_year=self.year, year=checkYear,
+                                                                   semester=semester)
                         for opt in optionals:
                             creditCount += opt.number_of_credits
                         if creditCount < 30:
@@ -185,7 +190,8 @@ class CurrentYearState(models.Model):
             for st in students:
                 for semester in [1, 2]:
                     # first assign mandatory courses for the year
-                    courses = Course.objects.filter(academic_year=self.year, year=st.group.year, semester=semester, study_line=st.group.study_line)
+                    courses = Course.objects.filter(academic_year=self.year, year=st.group.year, semester=semester,
+                                                    study_line=st.group.study_line)
                     for c in courses:
                         if isinstance(c, OptionalCourse):
                             continue
@@ -193,17 +199,19 @@ class CurrentYearState(models.Model):
                         nas.save()
 
                     # now assign courses not passed in previous years
-                    stcourses = StudentAssignedCourses.objects.filter(student=st, course__semester=semester).exclude(course__year = st.group.year)
+                    stcourses = StudentAssignedCourses.objects.filter(student=st, course__semester=semester).exclude(
+                        course__year=st.group.year)
                     for c in stcourses:
                         grade = Grade.objects.filter(student=st, course=c)
                         if grade.count() == 0 or grade.first().value() < 5:
-                            newCourse = Course.objects.filter(academic_year=self.year, semester=semester, name=c.name, study_line=st.group.study_line)
+                            newCourse = Course.objects.filter(academic_year=self.year, semester=semester, name=c.name,
+                                                              study_line=st.group.study_line)
                             if newCourse.count() > 0:
                                 nas = StudentAssignedCourses(student=st, course=newCourse.first(), year=self.year)
                                 nas.save()
                             else:
                                 # If no new matching course exist, assign old one and hope for the best
-                                nas = StudentAssignedCourses(student=st, course= c, year=self.year)
+                                nas = StudentAssignedCourses(student=st, course=c, year=self.year)
                                 nas.save()
 
             # now start optional course assignment
@@ -273,7 +281,8 @@ class CurrentYearState(models.Model):
                     # promote student
                     ng = StudyGroup.objects.filter(number=st.group.number + 10)
                     if ng.count() == 0:
-                        ng = StudyGroup(number=st.group.number + 10, year=st.group.year + 1, study_line=st.group.study_line)
+                        ng = StudyGroup(number=st.group.number + 10, year=st.group.year + 1,
+                                        study_line=st.group.study_line)
                         ng.save()
                     else:
                         ng = ng.first()
@@ -287,10 +296,10 @@ class CurrentYearState(models.Model):
             for c in courses:
                 if isinstance(c, OptionalCourse):
                     continue
-                nc = Course(name = c.name, teacher=c.teacher, study_line=c.study_line, year=c.year, semester=c.semester, academic_year=self.year,
+                nc = Course(name=c.name, teacher=c.teacher, study_line=c.study_line, year=c.year, semester=c.semester,
+                            academic_year=self.year,
                             number_credits=c.number_credits)
                 nc.save()
-
 
         if self.oldState == YearState.SEMESTER_1:
             self.semester += 1
@@ -306,13 +315,11 @@ class CurrentYearState(models.Model):
     def full_clean(self, *args, **kwargs):
         return self.clean(*args, **kwargs)
 
-    def save(self,  *args, **kwargs):
+    def save(self, *args, **kwargs):
         self.full_clean()
         self.oldState = self.crtState
 
         super(CurrentYearState, self).save(*args, **kwargs)
-
-
 
 
 # SIGNALS start here

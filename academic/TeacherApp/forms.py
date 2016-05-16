@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 
 from LoginApp.models import Teacher
 from StudentApp.models import StudyLine, Year
-from django.forms import Form, CharField, ChoiceField, TextInput
+from django.forms import Form, CharField, ChoiceField, TextInput, IntegerField
 
 from TeacherApp.models import OptionalCourse, PackageToOptionals, OptionalPackage
 
@@ -13,6 +13,7 @@ class OptionalForm(Form):
     study_line = ChoiceField(label="Study line", choices=StudyLine.CHOICES)
     year = ChoiceField(label="Year", choices=Year.CHOICES)
     semester = ChoiceField(label="Semester", choices=[(1, 1), (2, 2)])
+    nr_of_credits = IntegerField(label="Number of Credits")
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -29,8 +30,9 @@ class OptionalForm(Form):
             if OptionalCourse.objects.filter(teacher=current_teacher).count() == 2:
                 raise ValidationError("You can't add more optionals,maximum 2,delete some to add more.",
                                       code="opt_mt_two")
+            int(self.cleaned_data['nr_of_credits'])
         except KeyError:
-            pass
+            raise ValidationError("No name chosen for optional.", code="no_name")
         super(Form, self).clean()
 
 
@@ -79,7 +81,8 @@ class PackageForm(Form):
         for p in picked:
             o = OptionalCourse.objects.filter(name=p).first()
             if year != None and year != o.year or (semester != None and semester != o.semester):
-                raise ValidationError("Courses from one package should belong to the same year and semester!", code="bad_year")
+                raise ValidationError("Courses from one package should belong to the same year and semester!",
+                                      code="bad_year")
 
             semester = o.semester
             year = o.year

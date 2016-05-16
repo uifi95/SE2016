@@ -5,9 +5,13 @@
 
 {% block breadcrumbs %}{% endblock %}
 {% block content %}
-    <a href="{% url 'TeacherApp:add_opt' %}">
-        <button class="buton">Add another optional</button>
-    </a>
+    {% if current_year_state == 'Proposing optionals going on' %}
+        <a href="{% url 'TeacherApp:add_opt' %}">
+            <button class="buton">Add another optional</button>
+        </a>
+    {% else %}
+        <p>Optional Proposal period has ended.</p>
+    {% endif %}
     <br>
     <h2>My optionals:</h2>
     <table>
@@ -15,16 +19,22 @@
             <th>Optional name</th>
             <th>Study line</th>
             <th>Year</th>
+            <th>Semester</th>
+            <th>Nr. of Credits</th>
         </tr>
         {% for opt in optionals %}
             <tr>
                 <td id="centru">{{ opt.name }}</td>
                 <td id="centru">{{ opt.study_line }}</td>
                 <td id="centru">{{ opt.year }}</td>
-                <td><a href={% url 'TeacherApp:delete_optional' opt.id %}>
-                    <button class="buton">Delete Optional
-                    </button>
-                </a></td>
+                <td id="centru">{{ opt.semester }}</td>
+                <td id="centru">{{ opt.number_credits }}</td>
+                {% if current_year_state == 'Proposing optionals going on' %}
+                    <td><a href={% url 'TeacherApp:delete_optional' opt.id %}>
+                        <button class="buton">Delete Optional
+                        </button>
+                    </a></td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table>

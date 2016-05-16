@@ -86,6 +86,7 @@ def view_packages(request):
                   {"packages": zip(packages, courses),
                    "has_permission": True})
 
+
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
 def view_all_packages(request):
@@ -96,6 +97,7 @@ def view_all_packages(request):
     return render(request, "TeacherApp/view_all_packages.html",
                   {"packages": zip(packages, courses),
                    "has_permission": True})
+
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
@@ -116,7 +118,9 @@ def add_optional(request):
             studyLine = optform.cleaned_data["study_line"]
             year = optform.cleaned_data["year"]
             semester = optform.cleaned_data["semester"]
-            newOpt = OptionalCourse(name=name, study_line=studyLine, year=year, teacher=current_teacher, semester=semester)
+            nr_of_credits = optform.cleaned_data["nr_of_credits"]
+            newOpt = OptionalCourse(name=name, study_line=studyLine, year=year, teacher=current_teacher,
+                                    semester=semester, number_credits=nr_of_credits)
             newOpt.save()
             return redirect("TeacherApp:optionals")
         else:
@@ -144,8 +148,8 @@ def courses(request):
 def students(request, course_id):
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('group', 'first_name', 'last_name')
-    all_students = StudentAssignedCourses.objects.filter(course=course)
-    all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
+    all_students = [i.student for i in StudentAssignedCourses.objects.filter(course=course)]
+    # all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
               Grade.objects.filter(student__in=all_students, course=course).order_by(*args)]
@@ -207,28 +211,31 @@ def view_all_courses(request):
     crtYear = CurrentYearState.objects.first().year
     crtSemester = CurrentYearState.objects.first().semester
     teachers = [("Any", "All Teachers")] + [(i.user_id, i) for i in
-                                            Teacher.objects.distinct().filter(course__study_line=department, course__academic_year= crtYear,
-                                                                              course__semester= crtSemester)]
+                                            Teacher.objects.distinct().filter(course__study_line=department,
+                                                                              course__academic_year=crtYear,
+                                                                              course__semester=crtSemester)]
     if request.POST:
         form = TeacherDropDownForm(options=teachers, data=request.POST)
         if form.is_valid():
             if form.cleaned_data["teacher"] != "Any":
                 course_list = Course.objects.filter(study_line=department,
                                                     teacher=Teacher.objects.filter(
-                                                    user_id=form.cleaned_data["teacher"]).first(),
+                                                        user_id=form.cleaned_data["teacher"]).first(),
                                                     year=crtYear,
                                                     semester=crtSemester)
                 return render(request, "TeacherApp/view_courses.html",
                               {"courses": course_list, 'form': form, "has_permission": True})
             else:
                 form = TeacherDropDownForm(options=teachers)
-                course_list = Course.objects.filter(study_line=department, year=crtYear, semester=crtSemester).order_by("teacher")
+                course_list = Course.objects.filter(study_line=department, year=crtYear, semester=crtSemester).order_by(
+                    "teacher")
                 return render(request, "TeacherApp/view_courses.html",
                               {"courses": course_list, 'form': form, "has_permission": True})
 
     else:
         form = TeacherDropDownForm(options=teachers)
 
-        course_list = Course.objects.filter(study_line=department, year=crtYear, semester=crtSemester).order_by("teacher")
+        course_list = Course.objects.filter(study_line=department, year=crtYear, semester=crtSemester).order_by(
+            "teacher")
         return render(request, "TeacherApp/view_courses.html",
                       {"courses": course_list, 'form': form, "has_permission": True})

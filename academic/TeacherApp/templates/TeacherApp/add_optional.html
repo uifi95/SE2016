@@ -8,7 +8,19 @@
 {% block content %}
 
 <div id="content-main">
-
+    {% if form.errors and not form.non_field_errors %}
+        <p class="errornote">
+            {% if form.errors.items|length == 1 %} "Please correct the error below."{% else %}"Please correct the errors
+                below."{% endif %}
+        </p>
+    {% endif %}
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <p class="errornote">
+                {{ error }}
+            </p>
+        {% endfor %}
+    {% endif %}
 <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
   <div class="form-row">
     {{ form.name.errors }}
@@ -21,6 +33,14 @@
     <div class="form-row">
     {{ form.year.errors }}
     {{ form.year.label_tag }} {{ form.year }}
+  </div>
+      <div class="form-row">
+    {{ form.semester.errors }}
+    {{ form.semester.label_tag }} {{ form.semester }}
+  </div>
+      <div class="form-row">
+    {{ form.nr_of_credits.errors }}
+    {{ form.nr_of_credits.label }} {{ form.nr_of_credits }}
   </div>
   <div class="submit-row" id="btn">
     <label >&nbsp;</label><input type="submit"  value="Add optional!" />

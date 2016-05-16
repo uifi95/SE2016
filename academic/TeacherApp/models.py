@@ -14,10 +14,10 @@ class Course(models.Model):
     study_line = models.CharField(max_length=50, choices=StudyLine.CHOICES)
     year = models.IntegerField("Year", choices=Year.CHOICES, default=1)
     academic_year = models.IntegerField("Course academic year", default=2014)
-    semester = models.IntegerField("Semester", choices=[(1,1), (2, 2)], default=1)
+    semester = models.IntegerField("Semester", choices=[(1, 1), (2, 2)], default=1)
     number_credits = models.IntegerField("Number of credits", default=6)
 
-    def save(self,  *args, **kwargs):
+    def save(self, *args, **kwargs):
         self.academic_year = CurrentYearState.objects.first().year
         super(Course, self).save(*args, **kwargs)
 
@@ -49,7 +49,7 @@ class OptionalPackage(models.Model):
     number_of_credits = models.IntegerField("Number of credits", default=4)
     department = models.CharField(max_length=50, choices=StudyLine.CHOICES, default=StudyLine.CHOICES[0])
 
-    def save(self,  *args, **kwargs):
+    def save(self, *args, **kwargs):
         self.academic_year = CurrentYearState.objects.first().year
         super(OptionalPackage, self).save(*args, **kwargs)
 
@@ -64,6 +64,7 @@ class StudentOptions(models.Model):
     package = models.ForeignKey(OptionalPackage, on_delete=models.CASCADE)
     course = models.ForeignKey(OptionalCourse, on_delete=models.CASCADE)
     preference = models.IntegerField("Course preference")
+
 
 class StudentAssignedCourses(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
