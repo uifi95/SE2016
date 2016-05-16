@@ -41,6 +41,8 @@ def optionals(request):
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(lambda user: CurrentYearState.objects.first().crtState == YearState.OPTIONAL_PROPOSAL,
+                  login_url=reverse_lazy('LoginApp:login'))
 def delete_optional(request, optional_id):
     course = OptionalCourse.objects.filter(id=optional_id)
     course.delete()
@@ -117,6 +119,8 @@ def delete_package(request, package_id):
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(lambda user: CurrentYearState.objects.first().crtState == YearState.OPTIONAL_PROPOSAL,
+                  login_url=reverse_lazy('LoginApp:login'))
 def add_optional(request):
     current_teacher = request.user.client_set.first().teacher
     if request.POST:
