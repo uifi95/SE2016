@@ -221,7 +221,10 @@ class CurrentYearState(models.Model):
                 preferences = StudentOptions.objects.filter(student=st, package__academic_year=self.year)
                 for p in preferences:
                     if p.preference == 1:
-                        numberOfPreferences[p.course] += 1
+                        if p.course in numberOfPreferences.keys():
+                            numberOfPreferences[p.course] += 1
+                        else:
+                            numberOfPreferences[p.course] = 1
             packages = OptionalPackage.objects.filter(academic_year=self.year)
             for st in students:
                 for p in packages:
@@ -237,7 +240,7 @@ class CurrentYearState(models.Model):
                     if not is_good:
                         sp = sorted(prefs, key=lambda x: x.preference)
                         for pref in sp:
-                            if numberOfPreferences[pref.course] >= 20:
+                            if pref.course in numberOfPreferences.keys() and numberOfPreferences[pref.course] >= 20:
                                 nas = StudentAssignedCourses(student=st, course=pref.course, year=self.year)
                                 nas.save()
                                 is_good = True
