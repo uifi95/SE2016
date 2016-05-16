@@ -162,9 +162,8 @@ def courses(request):
 def students(request, course_id):
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('group', 'first_name', 'last_name')
-    #killmepls
-    all_students = StudentAssignedCourses.objects.filter(course=course)
-    all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
+    all_students = [i.student for i in StudentAssignedCourses.objects.filter(course=course)]
+    # all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
               Grade.objects.filter(student__in=all_students, course=course).order_by(*args)]

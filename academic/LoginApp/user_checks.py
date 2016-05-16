@@ -6,7 +6,9 @@ def student_check(user):
 
 
 def admin_check(user):
-    return user.is_staff()
+    if not user.client_set.count():
+        return False
+    return user.groups.filter(name="staff").exists()
 
 
 def teacher_check(user):

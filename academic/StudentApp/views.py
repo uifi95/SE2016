@@ -1,12 +1,18 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
+from reportlab.lib import styles
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.pdfgen import canvas
+from reportlab.platypus.para import Paragraph
 
 from LoginApp.models import Student
-from LoginApp.user_checks import student_check
+from LoginApp.user_checks import student_check, admin_check
 from StudentApp.forms import SelectOptionals
+from StudentApp.models import StudyGroup
 from TeacherApp.models import Grade, PackageToOptionals, OptionalPackage, OptionalCourse, StudentOptions, \
     StudentAssignedCourses
 
@@ -61,3 +67,4 @@ def study_contract(request):
     else:
         form = SelectOptionals(student, student.group.year)
         return render(request, "StudentApp/study_contracts.html", {'form': form, "has_permission": True})
+
