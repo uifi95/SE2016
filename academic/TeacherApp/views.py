@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 
-from LoginApp.models import ChiefOfDepartment, CurrentYearState
+from LoginApp.models import ChiefOfDepartment, CurrentYearState, YearState
 from LoginApp.models import Student
 from LoginApp.user_checks import teacher_check, dchief_check
 from TeacherApp.forms import *
@@ -49,6 +49,8 @@ def delete_optional(request, optional_id):
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(dchief_check, login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(lambda user: CurrentYearState.objects.first().crtState == YearState.OPTIONAL_PACKAGES,
+                  login_url=reverse_lazy('LoginApp:login'))
 def create_package(request):
     department = request.user.client_set.first().teacher.chiefofdepartment.department
     if request.POST:
@@ -101,6 +103,8 @@ def view_all_packages(request):
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
+@user_passes_test(lambda user: CurrentYearState.objects.first().crtState == YearState.OPTIONAL_PACKAGES,
+                  login_url=reverse_lazy('LoginApp:login'))
 def delete_package(request, package_id):
     package = OptionalPackage.objects.filter(id=package_id)
     courses_to_reset = [i.course for i in PackageToOptionals.objects.filter(package=package)]
