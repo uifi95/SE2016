@@ -11,4 +11,4 @@ def basics_processors(request):
     return {'site_title': "Academic Authentication System",
             "is_chief": request.user.groups.filter(name="dchief").exists(),
             'main_url': reverse("LoginApp:main"),
-            'current_year_state': CurrentYearState.objects.first().crtState}
+            'current_year_state': CurrentYearState.objects.first()}

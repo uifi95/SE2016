@@ -7,7 +7,7 @@
 
 {% block content %}
     {% for package,courses in packages %}
-        <h1  id="studtbl">{{ package.name }}</h1>
+        <h1 id="studtbl">{{ package.name }}</h1>
         <a href={% url 'TeacherApp:delete_package' package.id %}>
             <button class="buton" style="margin-left: 20%">Delete package
             </button>
@@ -18,12 +18,16 @@
                 <th>Name</th>
                 <th>Teacher</th>
                 <th>Year</th>
+                <th>Semester</th>
+                <th>Nr. of credits</th>
             </tr>
             {% for course in courses %}
                 <tr>
                     <td id="centru">{{ course.name }}</td>
                     <td id="centru">{{ course.teacher }}</td>
                     <td id="centru">{{ course.year }}</td>
+                    <td id="centru">{{ course.semester }}</td>
+                    <td id="centru">{{ course.number_credits }}</td>
                 </tr>
             {% endfor %}
         </table>

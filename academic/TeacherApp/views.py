@@ -63,7 +63,7 @@ def create_package(request):
             for el in opts:
                 po = PackageToOptionals(package=np, course=el)
                 po.save()
-                el.number_credits = po.number_of_credits
+                el.number_credits = form.cleaned_data['number_of_credits']
                 el.save()
             return redirect("TeacherApp:dchief_page")
         else:
@@ -103,6 +103,10 @@ def view_all_packages(request):
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
 def delete_package(request, package_id):
     package = OptionalPackage.objects.filter(id=package_id)
+    courses_to_reset = [i.course for i in PackageToOptionals.objects.filter(package=package)]
+    for course in courses_to_reset:
+        course.number_credits = 0
+        course.save()
     package.delete()
     return redirect("TeacherApp:view_packages")
 
@@ -118,7 +122,7 @@ def add_optional(request):
             studyLine = optform.cleaned_data["study_line"]
             year = optform.cleaned_data["year"]
             semester = optform.cleaned_data["semester"]
-            nr_of_credits = optform.cleaned_data["nr_of_credits"]
+            nr_of_credits = 0
             newOpt = OptionalCourse(name=name, study_line=studyLine, year=year, teacher=current_teacher,
                                     semester=semester, number_credits=nr_of_credits)
             newOpt.save()
@@ -214,28 +218,28 @@ def view_all_courses(request):
                                             Teacher.objects.distinct().filter(course__study_line=department,
                                                                               course__academic_year=crtYear,
                                                                               course__semester=crtSemester)]
+    all_courses = Course.objects.filter(study_line=department, academic_year=crtYear,
+                                        semester=crtSemester).order_by("teacher")
     if request.POST:
         form = TeacherDropDownForm(options=teachers, data=request.POST)
         if form.is_valid():
             if form.cleaned_data["teacher"] != "Any":
-                course_list = Course.objects.filter(study_line=department,
-                                                    teacher=Teacher.objects.filter(
-                                                        user_id=form.cleaned_data["teacher"]).first(),
-                                                    year=crtYear,
-                                                    semester=crtSemester)
+                filtered_courses = Course.objects.filter(study_line=department,
+                                                         teacher=Teacher.objects.filter(
+                                                             user_id=form.cleaned_data["teacher"]).first(),
+                                                         academic_year=crtYear,
+                                                         semester=crtSemester)
                 return render(request, "TeacherApp/view_courses.html",
-                              {"courses": course_list, 'form': form, "has_permission": True})
+                              {"courses": filtered_courses, 'form': form, "has_permission": True})
             else:
                 form = TeacherDropDownForm(options=teachers)
-                course_list = Course.objects.filter(study_line=department, year=crtYear, semester=crtSemester).order_by(
-                    "teacher")
                 return render(request, "TeacherApp/view_courses.html",
-                              {"courses": course_list, 'form': form, "has_permission": True})
+                              {"courses": all_courses, 'form': form, "has_permission": True})
 
     else:
         form = TeacherDropDownForm(options=teachers)
 
-        course_list = Course.objects.filter(study_line=department, year=crtYear, semester=crtSemester).order_by(
-            "teacher")
+        course_list = Course.objects.filter(study_line=department, academic_year=crtYear,
+                                            semester=crtSemester).order_by("teacher")
         return render(request, "TeacherApp/view_courses.html",
-                      {"courses": course_list, 'form': form, "has_permission": True})
+                      {"courses": all_courses, 'form': form, "has_permission": True})

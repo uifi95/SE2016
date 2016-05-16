@@ -5,7 +5,7 @@
 
 {% block breadcrumbs %}{% endblock %}
 {% block content %}
-    {% if current_year_state == 'Proposing optionals going on' %}
+    {% if current_year_state.crtState == 'Proposing optionals going on' %}
         <a href="{% url 'TeacherApp:add_opt' %}">
             <button class="buton">Add another optional</button>
         </a>
@@ -20,7 +20,6 @@
             <th>Study line</th>
             <th>Year</th>
             <th>Semester</th>
-            <th>Nr. of Credits</th>
         </tr>
         {% for opt in optionals %}
             <tr>
@@ -28,8 +27,12 @@
                 <td id="centru">{{ opt.study_line }}</td>
                 <td id="centru">{{ opt.year }}</td>
                 <td id="centru">{{ opt.semester }}</td>
-                <td id="centru">{{ opt.number_credits }}</td>
-                {% if current_year_state == 'Proposing optionals going on' %}
+                {% if opt.number_credits != 0 %}
+                    <td id="centru">{{ opt.number_credits }}</td>
+                {% else %}
+                    <td id="centru">Not in a Package</td>
+                {% endif %}
+                {% if current_year_state.crtState == 'Proposing optionals going on' %}
                     <td><a href={% url 'TeacherApp:delete_optional' opt.id %}>
                         <button class="buton">Delete Optional
                         </button>

@@ -3,20 +3,21 @@ import random
 
 import django
 
-
 os.environ['DJANGO_SETTINGS_MODULE'] = "academic.settings"
 
 django.setup()
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from TeacherApp.models import Grade, Course, PackageToOptionals, StudentOptions, StudentAssignedCourses, OptionalPackage
 from StudentApp.models import StudyGroup, StudyLine, Year
 from django.db.utils import IntegrityError
 
-from LoginApp.models import Client, Student, Teacher, Staff, CurrentYearState, YearState
+from LoginApp.models import Client, Student, Teacher, Staff, CurrentYearState, YearState, ChiefOfDepartment
+
 
 def delete_all(bla):
     pass
+
 
 def cleanDB():
     delete_all(CurrentYearState.objects.all().delete())
@@ -33,20 +34,21 @@ def cleanDB():
     delete_all(Staff.objects.all().delete())
     delete_all(User.objects.all().delete())
 
+
 if __name__ == "__main__":
     firstNames = ["Emil", "Ion", "Cornel", "Maria", "Vasile", "Bogdan", "Ana", "Laura", "Melisa", "Sergiu", "Ionut"]
     lastNames = ["Mihalache", "Tomescu", "Miclea", "Ciobanu", "Rusu", "Cosma", "Centea", "Pop", "Popa", "Rus", "Dan",
                  "Pan", "Cornea"]
     print("Cleaning up db...")
     cleanDB()
-    print ("Creating year state...")
+    print("Creating year state...")
     yearState = CurrentYearState(year=2014, semester=1, crtState=YearState.OPTIONAL_PROPOSAL)
     yearState.save()
-    print ("Creating groups...")
+    print("Creating groups...")
     groups = []
     for i in range(9):
         gr = StudyGroup(number=910 + i, study_line=random.choice(StudyLine.CHOICES)[1],
-                            year=random.choice(Year.CHOICES)[1])
+                        year=random.choice(Year.CHOICES)[1])
         gr.save()
         groups.append(gr)
     print("Creating 50 students...")
@@ -87,14 +89,24 @@ if __name__ == "__main__":
     t.is_activated = True
     t.save()
 
+    print("Creating 1 chief of department...")
+    dc = ChiefOfDepartment(department=StudyLine.INFO, first_name=random.choice(firstNames),
+                           last_name=random.choice(lastNames), email="bla@bla.com")
+    dc.save()
+    dc.user.set_password("parolaparola")
+    dc.user.save()
+    dc.is_activated = True
+    dc.save()
+    teacherList.append(dc)
+
     cnames = ["Object oriented programming", "Software Engineering", "Web programming", "Artificial Intelligence",
               "English", "Dynamic Systems", "Cryptography", "Databases"]
     courses = []
-    print("Creating 200 courses")
-    for i in range(200):
+    print("Creating 220 courses")
+    for i in range(220):
         name = cnames[i % len(cnames)] + " Version " + str(i)
         c = Course(name=name, teacher=random.choice(teacherList), study_line=random.choice(StudyLine.CHOICES)[1],
-                   year=random.choice(Year.CHOICES)[1], semester=random.choice([1,2]), number_credits=8)
+                   year=random.choice(Year.CHOICES)[1], semester=random.choice([1, 2]), number_credits=8)
         c.save()
         courses.append(c)
 
@@ -122,15 +134,14 @@ if __name__ == "__main__":
             f.write("Admin: " + a.user.username + "\n")
         f.write("Student: " + studList[0].user.username + "\n")
         f.write("Teacher: " + teacherList[0].user.username + "\n")
+        f.write("Department chief: " + dc.user.username + "\n")
 
         f.write("\nStudents:\n")
         for el in studList[1:]:
-            f.write(el.user.username + "\t" + el.get_temp_pass()  + "\n")
+            f.write(el.user.username + "\t" + el.get_temp_pass() + "\n")
 
         f.write("\nTeachers:\n")
         for el in teacherList[1:]:
-            f.write(el.user.username + "\t" + el.get_temp_pass()  + "\n")
+            f.write(el.user.username + "\t" + el.get_temp_pass() + "\n")
 
     print("Done..")
-
-

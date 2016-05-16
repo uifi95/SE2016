@@ -12,7 +12,7 @@ def admin_check(user):
 def teacher_check(user):
     if not user.client_set.count():
         return False
-    return user.client_set.first().type == "teacher"
+    return user.groups.filter(name="teacher").exists()
 
 
 def dchief_check(user):

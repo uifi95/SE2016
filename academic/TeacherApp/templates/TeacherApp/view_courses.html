@@ -8,22 +8,25 @@
 {% block content %}
     <form action="{{ app_path }}" method="post" id="grade-form">{% csrf_token %}
         <div class="form-row">
+            <h2>All courses from year {{ current_year_state.year }} :</h2>
             {{ form.teacher.label_tag }} {{ form.teacher }}
-            <input style="width:108px" type="submit" value="Filter" name="filter_button">
         </div>
     </form>
-    <h2>All courses:</h2>
     <table>
         <tr>
             <th>Name</th>
-            <th>Teacher name</th>
+            <th>Teacher</th>
             <th>Year</th>
+            <th>Semester</th>
+            <th>Number of credits</th>
         </tr>
         {% for course in courses %}
             <tr>
                 <td id="centru">{{ course.name }}</td>
                 <td id="centru">{{ course.teacher }}</td>
                 <td id="centru">{{ course.year }}</td>
+                <td id="centru">{{ course.semester }}</td>
+                <td id="centru">{{ course.number_credits }}</td>
             </tr>
         {% endfor %}
     </table>

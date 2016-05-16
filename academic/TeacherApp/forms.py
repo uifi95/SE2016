@@ -13,7 +13,6 @@ class OptionalForm(Form):
     study_line = ChoiceField(label="Study line", choices=StudyLine.CHOICES)
     year = ChoiceField(label="Year", choices=Year.CHOICES)
     semester = ChoiceField(label="Semester", choices=[(1, 1), (2, 2)])
-    nr_of_credits = IntegerField(label="Number of Credits")
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -30,7 +29,6 @@ class OptionalForm(Form):
             if OptionalCourse.objects.filter(teacher=current_teacher).count() == 2:
                 raise ValidationError("You can't add more optionals,maximum 2,delete some to add more.",
                                       code="opt_mt_two")
-            int(self.cleaned_data['nr_of_credits'])
         except KeyError:
             raise ValidationError("No name chosen for optional.", code="no_name")
         super(Form, self).clean()
@@ -80,7 +78,7 @@ class PackageForm(Form):
             pass
         for p in picked:
             o = OptionalCourse.objects.filter(name=p).first()
-            if year != None and year != o.year or (semester != None and semester != o.semester):
+            if (year is not None) and year != o.year or (semester is not None and semester != o.semester):
                 raise ValidationError("Courses from one package should belong to the same year and semester!",
                                       code="bad_year")
 
@@ -92,7 +90,7 @@ class PackageForm(Form):
 class TeacherDropDownForm(Form):
     def __init__(self, options, *args, **kwargs):
         super(Form, self).__init__(*args, **kwargs)
-        self.fields['teacher'] = forms.ChoiceField(widget=forms.Select,
+        self.fields['teacher'] = forms.ChoiceField(widget=forms.Select(attrs={'onChange': 'this.form.submit();'}),
                                                    choices=options, label="Teacher name:")
 
         def clean(self):
