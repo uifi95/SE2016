@@ -11,16 +11,16 @@
             <th>Course</th>
             <th>Year</th>
             <th>Teacher</th>
+            <th>Nr. of Credits</th>
             <th>Grade</th>
-            <th>Credits</th>
         </tr>
-        {% for item in table %}
+        {% for course, grade in table %}
             <tr>
-                <td>{{ item.course }}</td>
-                <td>{{ item.course.year }}</td>
-                <td>{{ item.course.teacher }}</td>
-                <td>{{ item.value }}</td>
-                <td>{{ item.course.number_credits }}</td>
+                <td>{{ course.name }}</td>
+                <td>{{ course.year }}</td>
+                <td>{{ course.teacher }}</td>
+                <td>{{ course.number_credits }}</td>
+                <td>{{ grade }}</td>
             </tr>
         {% endfor %}
     </table>

@@ -7,7 +7,8 @@ from django.shortcuts import render, redirect
 from LoginApp.models import Student
 from LoginApp.user_checks import student_check
 from StudentApp.forms import SelectOptionals
-from TeacherApp.models import Grade, PackageToOptionals, OptionalPackage, OptionalCourse, StudentOptions
+from TeacherApp.models import Grade, PackageToOptionals, OptionalPackage, OptionalCourse, StudentOptions, \
+    StudentAssignedCourses
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -23,8 +24,16 @@ def main_page(request):
 @user_passes_test(student_check, login_url=reverse_lazy('LoginApp:login'))
 def grades(request):
     current_student = request.user.client_set.first()
-    queryset = Grade.objects.all().filter(student=current_student).order_by("course")
-    return render(request, "StudentApp/grades.html", {"table": queryset, "has_permission": True})
+    courses = [i.course for i in
+               StudentAssignedCourses.objects.filter(student=current_student)]
+    for i in range(len(courses)):
+        if Grade.objects.filter(course=courses[i]):
+            grade = Grade.objects.get(course=courses[i]).value
+            courses[i] = (courses[i], grade)
+        else:
+            courses[i] = (courses[i], "None")
+    return render(request, "StudentApp/grades.html", {"table": courses, "has_permission": True})
+
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(student_check, login_url=reverse_lazy('LoginApp:login'))
