@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from LoginApp.models import ChiefOfDepartment, CurrentYearState, YearState
 from LoginApp.models import Student
 from LoginApp.user_checks import teacher_check, dchief_check
+from StudentApp.models import StudyGroup
 from TeacherApp.forms import *
 from TeacherApp.models import Grade, OptionalCourse, Course, OptionalPackage, PackageToOptionals, StudentAssignedCourses
 
@@ -159,11 +160,18 @@ def courses(request):
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
-def students(request, course_id):
+def students(request, course_id, group_number=0):
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('group', 'first_name', 'last_name')
-    all_students = [i.student for i in StudentAssignedCourses.objects.filter(course=course)]
-    # all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
+    groups = [(0, "All Groups")] + [(i.number, i.number) for i in
+                                    StudyGroup.objects.distinct().filter(
+                                        student__studentassignedcourses__course_id=course_id).order_by('number')]
+    if int(group_number) != 0:
+        all_students = StudentAssignedCourses.objects.filter(course=course, student__group__number=group_number)
+    else:
+        print(course)
+        all_students = StudentAssignedCourses.objects.filter(course=course)
+    all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
               Grade.objects.filter(student__in=all_students, course=course).order_by(*args)]
@@ -172,18 +180,37 @@ def students(request, course_id):
         if not Grade.objects.filter(student=student, course=course).exists():
             grades = grades[:count] + [''] + grades[count:]
         count += 1
-    return render(request, "TeacherApp/students.html",
-                  {"students": zip(all_students, grades), 'course_id': course_id, "has_permission": True})
+    if request.POST:
+        if group_number == 0:
+            form = GroupDropDownForm(options=groups, data=request.POST)
+        else:
+            form = GroupDropDownForm(options=groups, selected=group_number, data=request.POST)
+        if form.is_valid():
+            group_number = form.cleaned_data['group']
+            return redirect("TeacherApp:students", course_id=course_id, group_number=group_number)
+    else:
+        if group_number == 0:
+            form = GroupDropDownForm(options=groups)
+        else:
+            form = GroupDropDownForm(options=groups, selected=group_number)
+        return render(request, "TeacherApp/students.html",
+                      {"students": zip(all_students, grades), 'course_id': course_id, 'group_number': group_number,
+                       'form': form,
+                       "has_permission": True})
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
-def edit(request, course_id, student_id, grade_exists=None):
+def edit(request, course_id, student_id, group_number):
     form = GradeForm()
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('group', 'first_name', 'last_name')
     all_students = StudentAssignedCourses.objects.filter(course=course)
-    all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
+    if int(group_number) != 0:
+        all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number'),
+                                              group__number=int(group_number)).order_by(*args)
+    else:
+        all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
 
     args = ('student__' + i for i in args)
     grades = [elem.value for elem in
@@ -206,15 +233,15 @@ def edit(request, course_id, student_id, grade_exists=None):
                 grade = Grade.objects.filter(student=student, course=course).first()
                 grade.value = value
             grade.save()
-            return students(request, course_id)
+            return redirect('TeacherApp:students', course_id=course_id, group_number=group_number)
         else:
             return render(request, "TeacherApp/edit.html",
                           {"students": zip(all_students, grades), 'form': form, "student_id": int(student_id),
-                           "course_id": course_id,
+                           "course_id": course_id, "group_number": group_number,
                            "has_permission": True})
     return render(request, "TeacherApp/edit.html",
                   {"students": zip(all_students, grades), 'form': form, "student_id": int(student_id),
-                   "course_id": course_id,
+                   "course_id": course_id, "group_number": group_number,
                    "has_permission": True})
 
 
@@ -259,14 +286,16 @@ def view_all_courses(request):
 @user_passes_test(dchief_check, login_url=reverse_lazy('LoginApp:login'))
 def statistics(request):
     department = request.user.client_set.first().teacher.chiefofdepartment.department
-    best_teacher = max(Teacher.objects.filter(course__study_line=department),key=return_best_teacher)
-    worst_teacher =min(Teacher.objects.filter(course__study_line=department),key=return_worst_teacher)
-    best_discipline = max(Course.objects.filter(study_line=department),key=return_best_discipline)
-    worst_discipline = min(Course.objects.filter(study_line=department),key=return_worst_discipline)
-    return render(request, "TeacherApp/statistics.html",{"best_teacher":best_teacher,"worst_teacher":worst_teacher,
-                                                         "best_discipline":best_discipline,"worst_discipline":worst_discipline,"has_permission":True})
+    best_teacher = max(Teacher.objects.filter(course__study_line=department), key=return_best_teacher)
+    worst_teacher = min(Teacher.objects.filter(course__study_line=department), key=return_worst_teacher)
+    best_discipline = max(Course.objects.filter(study_line=department), key=return_best_discipline)
+    worst_discipline = min(Course.objects.filter(study_line=department), key=return_worst_discipline)
+    return render(request, "TeacherApp/statistics.html", {"best_teacher": best_teacher, "worst_teacher": worst_teacher,
+                                                          "best_discipline": best_discipline,
+                                                          "worst_discipline": worst_discipline, "has_permission": True})
 
-#helper functions
+
+# helper functions
 def return_best_teacher(teacher):
     if Grade.objects.filter(course__teacher=teacher):
         return mean([i.value for i in Grade.objects.filter(course__teacher=teacher)])
@@ -280,11 +309,14 @@ def return_worst_teacher(teacher):
     else:
         return 10
 
+
 def return_best_discipline(discipline):
     if Grade.objects.filter(course=discipline):
         return mean([i.value for i in Grade.objects.filter(course=discipline)])
     else:
         return 0
+
+
 def return_worst_discipline(discipline):
     if Grade.objects.filter(course=discipline):
         return mean([i.value for i in Grade.objects.filter(course=discipline)])

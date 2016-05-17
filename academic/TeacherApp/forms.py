@@ -95,3 +95,15 @@ class TeacherDropDownForm(Form):
 
         def clean(self):
             super(Form, self).clean()
+
+
+class GroupDropDownForm(Form):
+    def __init__(self, options, selected=0, *args, **kwargs):
+        super(Form, self).__init__(*args, **kwargs)
+        if selected == 0:
+            selected = options[0]
+        self.fields['group'] = forms.ChoiceField(widget=forms.Select(attrs={'onChange': 'this.form.submit();'}, ),
+                                                 choices=options, label="Group Number:", initial=selected)
+
+        def clean(self):
+            super(Form, self).clean()

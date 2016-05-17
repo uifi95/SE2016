@@ -14,7 +14,7 @@
                 {% for course in courses %}
                     {% if course.study_line == line and course.year == year%}
                         <tr>
-                            <td><a href="{% url 'TeacherApp:students' course.id %}">{{ course.name }}</a></td>
+                            <td><a href="{% url 'TeacherApp:students' course.id 0 %}">{{ course.name }}</a></td>
                         </tr>
                     {% endif %}
                 {% endfor %}
