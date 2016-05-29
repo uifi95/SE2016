@@ -7,7 +7,7 @@ from StudentApp.models import Year, StudyGroup
 
 class Course(models.Model):
     class Meta:
-        unique_together = (('name', 'teacher', 'study_line', 'year'),)
+        unique_together = (('name', 'teacher', 'study_line', 'year', 'academic_year'),)
 
     name = models.CharField(max_length=100)
     teacher = models.ForeignKey(Teacher, null=False, default=1)
@@ -18,7 +18,8 @@ class Course(models.Model):
     number_credits = models.IntegerField("Number of credits", default=6)
 
     def save(self, *args, **kwargs):
-        self.academic_year = CurrentYearState.objects.first().year
+        if not self.academic_year:
+            self.academic_year = CurrentYearState.objects.first().year
         super(Course, self).save(*args, **kwargs)
 
     def __str__(self):

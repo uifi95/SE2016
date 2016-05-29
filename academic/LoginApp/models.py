@@ -153,6 +153,7 @@ class CurrentYearState(models.Model):
     semester = models.IntegerField("Current Semester")
     crtState = models.CharField("Current State", max_length=50, choices=YearState.CHOICHES)
     oldState = models.CharField("Old State", max_length=50, choices=YearState.CHOICHES, null=True)
+    cleanCalled = False
 
     class Meta:
         verbose_name_plural = 'Current year state'
@@ -195,7 +196,6 @@ class CurrentYearState(models.Model):
                                                     study_line=st.group.study_line)
                     for c in courses:
                         if OptionalCourse.objects.filter(name=c.name, teacher=c.teacher, year=c.year, academic_year=c.academic_year).count() != 0:
-                            print("Found optional")
                             continue
                         nas = StudentAssignedCourses(student=st, course=c, year=self.year)
                         nas.save()
@@ -206,7 +206,7 @@ class CurrentYearState(models.Model):
                     for sc in stcourses:
                         c = sc.course
                         grade = Grade.objects.filter(student=st, course=c)
-                        if grade.count() == 0 or grade.first().value() < 5:
+                        if grade.count() == 0 or grade.first().value < 5:
                             newCourse = Course.objects.filter(academic_year=self.year, semester=semester, name=c.name,
                                                               study_line=st.group.study_line)
                             if newCourse.count() > 0:
@@ -235,7 +235,6 @@ class CurrentYearState(models.Model):
                     for pr in prefs:
                         if pr.preference == 1 and numberOfPreferences[pr.course] >= 20:
                             # all good here
-                            print("Added first pref")
                             nas = StudentAssignedCourses(student=st, course=pr.course, year=self.year)
                             nas.save()
                             is_good = True
@@ -244,7 +243,6 @@ class CurrentYearState(models.Model):
                         sp = sorted(prefs, key=lambda x: x.preference)
                         for pref in sp:
                             if pref.course in numberOfPreferences.keys() and numberOfPreferences[pref.course] >= 20:
-                                print("Added second pref")
                                 nas = StudentAssignedCourses(student=st, course=pref.course, year=self.year)
                                 nas.save()
                                 is_good = True
@@ -254,7 +252,6 @@ class CurrentYearState(models.Model):
                         # assign to first course with enough people if any
                         for el in numberOfPreferences.keys():
                             if numberOfPreferences[el] >= 20:
-                                print("Added 3rd scenario")
                                 nas = StudentAssignedCourses(student=st, course=el, year=self.year)
                                 nas.save()
                                 is_good = True
@@ -301,10 +298,11 @@ class CurrentYearState(models.Model):
             self.year += 1
             self.semester = 1
             # generate next year courses
-            courses = Course.objects.filter(year=self.year - 1)
+            courses = Course.objects.filter(academic_year=self.year - 1)
             for c in courses:
-                if isinstance(c, OptionalCourse):
+                if OptionalCourse.objects.filter(name=c.name, teacher=c.teacher, year=c.year, academic_year=c.academic_year).count() != 0:
                     continue
+
                 nc = Course(name=c.name, teacher=c.teacher, study_line=c.study_line, year=c.year, semester=c.semester,
                             academic_year=self.year,
                             number_credits=c.number_credits)
@@ -314,17 +312,23 @@ class CurrentYearState(models.Model):
             self.semester += 1
 
     def clean(self, *args, **kwargs):
+        self.cleanCalled = True
         if self.oldState is not None:
             crtIdx = YearState.CHOICHES.index((self.crtState, self.crtState))
             if YearState.CHOICHES[crtIdx - 1][0] != self.oldState:
                 raise ValidationError("Invalid state transition!")
-        self.execute_transition()
+        from django.db import transaction
+        with transaction.atomic():
+            self.execute_transition()
         super(CurrentYearState, self).clean()
 
     def full_clean(self, *args, **kwargs):
         return self.clean(*args, **kwargs)
 
     def save(self, *args, **kwargs):
+        if not self.cleanCalled:
+            self.clean(args, kwargs)
+        self.cleanCalled = False
         self.oldState = self.crtState
         super(CurrentYearState, self).save(*args, **kwargs)
 
