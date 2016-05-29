@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 from django.db import models
 
 
-
-
 class Year:
     CHOICES = []
     for i in range(1, 4):
