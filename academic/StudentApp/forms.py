@@ -1,7 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import Form, CharField, TextInput
+from django.forms import Form, CharField, TextInput, ChoiceField
 
+from StudentApp.models import Year
 from TeacherApp.models import OptionalPackage, PackageToOptionals, StudentOptions
 
 
@@ -47,9 +48,16 @@ class SelectInterval(Form):
 
     def clean(self):
         try:
-            if int(self.cleaned_data["leftInterval"]) not in range(0, 10) or int(self.cleaned_data["rightInterval"]) not in range(0, 10):
+            if int(self.cleaned_data["leftInterval"]) not in range(0, 10) or int(
+                    self.cleaned_data["rightInterval"]) not in range(0, 10):
                 raise ValidationError("Grade must be between 0 and 10", code="gr_val")
         except (ValueError, KeyError):
             raise ValidationError("Grade has to be a number.", code="has_tn")
-
         super(Form, self).clean()
+
+
+class YearSemesterDropDown(Form):
+    year = ChoiceField(widget=forms.Select(attrs={'onChange': 'this.form.submit();'}, ),
+                       choices=Year.CHOICES, label="Year:")
+    semester = ChoiceField(widget=forms.Select(attrs={'onChange': 'this.form.submit();'}, ),
+                           choices=[(1, 1), (2, 2)], label="Semester:")

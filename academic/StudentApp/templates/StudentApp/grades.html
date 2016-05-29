@@ -6,10 +6,14 @@
 {% block breadcrumbs %}{% endblock %}
 
 {% block content %}
+    <form action="{{ app_path }}" method="post" id="grade-form">{% csrf_token %}
+        <div class="form-row" align="center">
+            {{ form.year.label }} {{ form.year }} &emsp; &emsp; &emsp; {{ form.semester.label }} {{ form.semester }}
+        </div>
+    </form>
     <table>
         <tr>
             <th>Course</th>
-            <th>Year</th>
             <th>Teacher</th>
             <th>Nr. of Credits</th>
             <th>Grade</th>
@@ -17,7 +21,6 @@
         {% for course, grade in table %}
             <tr>
                 <td>{{ course.name }}</td>
-                <td>{{ course.year }}</td>
                 <td>{{ course.teacher }}</td>
                 <td>{{ course.number_credits }}</td>
                 <td>{{ grade }}</td>

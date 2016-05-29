@@ -6,17 +6,12 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
-from reportlab.lib import styles
-from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfgen import canvas
-from reportlab.platypus.para import Paragraph
-
 from LoginApp.models import Student
 from LoginApp.user_checks import student_check, admin_check
 from StudentApp.admin import return_grade
-from StudentApp.forms import SelectOptionals, SelectInterval
-from StudentApp.models import StudyGroup, Year
-from TeacherApp.models import Grade, PackageToOptionals, OptionalPackage, OptionalCourse, StudentOptions, \
+from StudentApp.forms import SelectOptionals, SelectInterval, YearSemesterDropDown
+from TeacherApp.models import Grade, PackageToOptionals, OptionalCourse, StudentOptions, \
     StudentAssignedCourses
 
 
@@ -33,15 +28,31 @@ def main_page(request):
 @user_passes_test(student_check, login_url=reverse_lazy('LoginApp:login'))
 def grades(request):
     current_student = request.user.client_set.first()
-    courses = [i.course for i in
-               StudentAssignedCourses.objects.filter(student=current_student)]
-    for i in range(len(courses)):
-        if Grade.objects.filter(course=courses[i]):
-            grade = Grade.objects.get(course=courses[i]).value
-            courses[i] = (courses[i], grade)
-        else:
-            courses[i] = (courses[i], "None")
-    return render(request, "StudentApp/grades.html", {"table": courses, "has_permission": True})
+    form = YearSemesterDropDown()
+    if request.POST:
+        form = YearSemesterDropDown(data=request.POST)
+        if form.is_valid():
+            year = form.cleaned_data['year']
+            semester = form.cleaned_data['semester']
+            courses = [i.course for i in
+                       StudentAssignedCourses.objects.filter(student=current_student, course__year=year,
+                                                             course__semester=semester)]
+            for i in range(len(courses)):
+                if Grade.objects.filter(course=courses[i]):
+                    grade = Grade.objects.get(course=courses[i]).value
+                    courses[i] = (courses[i], grade)
+                else:
+                    courses[i] = (courses[i], "None")
+    else:
+        courses = [i.course for i in
+                   StudentAssignedCourses.objects.filter(student=current_student, course__year=1, course__semester=1)]
+        for i in range(len(courses)):
+            if Grade.objects.filter(course=courses[i]):
+                grade = Grade.objects.get(course=courses[i]).value
+                courses[i] = (courses[i], grade)
+            else:
+                courses[i] = (courses[i], "None")
+    return render(request, "StudentApp/grades.html", {"table": courses, "form": form, "has_permission": True})
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -55,9 +66,9 @@ def study_contract(request):
                 course = OptionalCourse.objects.filter(name=course_name).first()
                 package = PackageToOptionals.objects.filter(course=course).first().package
                 pref = form.cleaned_data[course_name]
-                existentOptions = StudentOptions.objects.filter(student=student, course=course, package=package)
-                if existentOptions.count() > 1:
-                    opt = existentOptions.first()
+                existent_options = StudentOptions.objects.filter(student=student, course=course, package=package)
+                if existent_options.count() > 1:
+                    opt = existent_options.first()
                     opt.preference = pref
                     opt.save()
                 else:
@@ -90,28 +101,25 @@ def interval(request):
             c = 0
             p.setFont("Times-Roman", 15)
             p.drawString(102, xx, "Interval: " + "(" + str(leftval) + ", " + str(rightval) + ")")
-            xx = xx - 30
+            xx -= 30
             l = []
             for student in Student.objects.all():
                 courses = [i.course for i in StudentAssignedCourses.objects.filter(student=student)]
                 medie = mean([return_grade(course, student) for course in courses])
-                student_detail = []
-                student_detail.append(student.first_name)
-                student_detail.append(student.last_name)
-                student_detail.append(round(medie, 2))
+                student_detail = [student.first_name, student.last_name, round(medie, 2)]
                 l.append(student_detail)
             ordonata = sorted(l, key=lambda x: x[2], reverse=True)
             for student in ordonata:
-                if student[2] > leftval and student[2] < rightval:
+                if leftval < student[2] < rightval:
                     p.setFont("Times-Roman", 12)
                     p.drawString(80, xx, student[0] + " " + student[1] + " " + str(student[2]))
-                    c = c + 1
+                    c += 1
                     if c > 15:
                         p.showPage()
                         c = 0
                         xx = 700
-                    xx = xx - 30
-            xx = xx - 20
+                    xx -= 30
+            xx -= 20
             p.showPage()
             p.save()
             return response

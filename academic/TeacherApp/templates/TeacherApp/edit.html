@@ -24,7 +24,6 @@
         <tr>
             <th>Name</th>
             <th>ID Number</th>
-            <th>Group</th>
             <th>Grade</th>
             <th>Action</th>
         </tr>
@@ -33,7 +32,6 @@
                 {% if student.id == student_id %}
                     <td id="centrusel">{{ student }}</td>
                     <td id="centrusel">{{ student.id_number }}</td>
-                    <td id="centrusel"> {{ student.group.number }}</td>
                     <form action="{{ app_path }}" method="post" id="grade-form">{% csrf_token %}
                         <td id="centru">
                             {{ form.grade }}
@@ -45,7 +43,6 @@
                 {% else %}
                     <td id="centru">{{ student }}</td>
                     <td id="centru">{{ student.id_number }}</td>
-                    <td id="centru"> {{ student.group.number }}</td>
                     <td id="centru">{{ grade }}</td>
                     <td>
                         <a href="{% url 'TeacherApp:edit' course_id=course_id student_id=student.id group_number=group_number %}">
