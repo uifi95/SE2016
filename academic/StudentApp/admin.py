@@ -46,7 +46,8 @@ def student_by_groups(modeladmin, request, queryset):
         ordonata = sorted(l, key=lambda x: x[2], reverse=True)
         for student in ordonata:
             p.setFont("Times-Roman", 12)
-            p.drawString(80, xx, student[0] + " " + student[1] + " " + str(student[2]))
+            p.drawString(80, xx, student[1] + " " + student[0])
+            p.drawString(300,xx , str(student[2]))
             c = c + 1
             if c > 15:
                 p.showPage()
@@ -72,9 +73,15 @@ def student_by_year(modeladmin, request, queryset):
     p.drawString(70, 765, "Students ordered by professional results from each year ")
     xx = 700
     c = 0
+    maxim = 20
     for year in Year.CHOICES:
+
         p.setFont("Times-Roman", 15)
-        p.drawString(102, xx, "Year: " + str(year[0]))
+        p.drawString(10, xx, "Year: " + str(year[0]))
+        p.drawString(80, xx, "Name " )
+        p.drawString(270, xx, "Average Grade")
+        p.drawString(440, xx, "Group " )
+
         xx = xx - 30
         l = []
         for student in Student.objects.filter(group__year=year[0]):
@@ -84,19 +91,24 @@ def student_by_year(modeladmin, request, queryset):
             student_detail.append(student.first_name)
             student_detail.append(student.last_name)
             student_detail.append(round(medie, 2))
+            student_detail.append(student.group.number)
             l.append(student_detail)
         ordonata = sorted(l, key=lambda x: x[2], reverse=True)
         for student in ordonata:
             p.setFont("Times-Roman", 12)
-            p.drawString(80, xx, student[0] + " " + student[1] + " " + str(student[2]))
+            p.drawString(80, xx, student[1] + " " + student[0])
+            p.drawString(300,xx , str(student[2]))
+            p.drawString(450,xx,str(student[3]))
             c = c + 1
-            if c > 15:
+            if c > maxim:
                 p.showPage()
                 c = 0
-                xx = 700
+                xx = 800
             xx = xx - 30
-        xx = xx - 20
-    p.showPage()
+        xx = 800
+        c=0
+        p.showPage()
+
     p.save()
     return response
 

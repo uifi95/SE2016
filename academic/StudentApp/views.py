@@ -103,24 +103,42 @@ def interval(request):
             p.drawString(102, xx, "Interval: " + "(" + str(leftval) + ", " + str(rightval) + ")")
             xx -= 30
             l = []
+
             for student in Student.objects.all():
                 courses = [i.course for i in StudentAssignedCourses.objects.filter(student=student)]
                 medie = mean([return_grade(course, student) for course in courses])
-                student_detail = [student.first_name, student.last_name, round(medie, 2)]
+                student_detail = [student.first_name, student.last_name, round(medie, 2),student.group.year,student.group.number]
                 l.append(student_detail)
-            ordonata = sorted(l, key=lambda x: x[2], reverse=True)
-            for student in ordonata:
-                if leftval < student[2] < rightval:
-                    p.setFont("Times-Roman", 12)
-                    p.drawString(80, xx, student[0] + " " + student[1] + " " + str(student[2]))
-                    c += 1
-                    if c > 15:
-                        p.showPage()
-                        c = 0
-                        xx = 700
-                    xx -= 30
-            xx -= 20
-            p.showPage()
+            year1 = [i for i in l if i[3]==1]
+            year2 =[i for i in l if i[3]==2]
+            year3=[i for i in l if i[3]==3]
+            ordonata1 = sorted(year1, key=lambda x: x[2], reverse=True)
+            ordonata2 = sorted(year2, key=lambda x: x[2], reverse=True)
+            ordonata3 = sorted(year3, key=lambda x: x[2], reverse=True)
+            ordonata=[ordonata1,ordonata2,ordonata3]
+            p.setFont("Times-Roman", 15)
+
+            for ord in ordonata:
+                p.drawString(10, xx, "Year:" + str(ord[0][3]))
+                p.drawString(80, xx, "Name ")
+                p.drawString(270, xx, "Average Grade")
+                p.drawString(440, xx, "Group")
+                xx = xx - 30
+                for student in ord:
+                    if leftval < student[2] < rightval:
+                        p.setFont("Times-Roman", 12)
+                        p.drawString(80, xx, student[1] + " " + student[0])
+                        p.drawString(300, xx, str(student[2]))
+                        p.drawString(450,xx,str(student[4]))
+                        c += 1
+                        if c > 15:
+                            p.showPage()
+                            c = 0
+                            xx = 700
+                        xx -= 30
+                xx -= 20
+                xx=765
+                p.showPage()
             p.save()
             return response
         else:
