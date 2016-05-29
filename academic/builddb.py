@@ -1,3 +1,4 @@
+import datetime
 import os
 import random
 from django.db import transaction
@@ -8,7 +9,8 @@ os.environ['DJANGO_SETTINGS_MODULE'] = "academic.settings"
 django.setup()
 
 from django.contrib.auth.models import User, Group
-from TeacherApp.models import Grade, Course, PackageToOptionals, StudentOptions, StudentAssignedCourses, OptionalPackage
+from TeacherApp.models import Grade, Course, PackageToOptionals, StudentOptions, StudentAssignedCourses, OptionalPackage, \
+    ExaminationPeriod
 from StudentApp.models import StudyGroup, StudyLine, Year
 from django.db.utils import IntegrityError
 
@@ -130,10 +132,23 @@ def create_courses():
     return courses
 @transaction.atomic
 def generate_grades(yearState):
+    cs = Course.objects.filter(academic_year=yearState.year, semester=yearState.semester)
+    for c in cs:
+        grp = StudyGroup.objects.filter(year=c.year)
+        for g in grp:
+            if yearState.semester == 1:
+                month = 11
+                yr = yearState.year
+            else:
+                yr = yearState.year + 1
+                month = 6
+            d1 = datetime.date(yr, month,random.randint(1,28))
+            d2 = datetime.date(yr, month,random.randint(1,28))
+            ex = ExaminationPeriod(group=g, course=c, exam_date=d1, reexam_date=d2)
     asgn = StudentAssignedCourses.objects.filter(year=yearState.year)
     for a in asgn:
         if a.course.semester == yearState.semester:
-            grade = Grade(value=random.randint(2,10), student=a.student, course=a.course)
+            grade = Grade(value=random.randint(2,10), student=a.student, course=a.course, second_date=random.choice([True, False]))
             grade.save()
 
 if __name__ == "__main__":
