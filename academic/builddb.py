@@ -145,6 +145,7 @@ def generate_grades(yearState):
             d1 = datetime.date(yr, month,random.randint(1,28))
             d2 = datetime.date(yr, month,random.randint(1,28))
             ex = ExaminationPeriod(group=g, course=c, exam_date=d1, reexam_date=d2)
+            ex.save()
     asgn = StudentAssignedCourses.objects.filter(year=yearState.year)
     for a in asgn:
         if a.course.semester == yearState.semester:
