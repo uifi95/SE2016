@@ -36,6 +36,7 @@ def cleanDB():
     delete_all(Staff.objects.all().delete())
     delete_all(User.objects.all().delete())
 
+
 @transaction.atomic
 def create_teachers(count):
     teacherList = []
@@ -44,6 +45,7 @@ def create_teachers(count):
         t.save()
         teacherList.append(t)
     return teacherList
+
 
 @transaction.atomic
 def create_admins(count):
@@ -57,6 +59,7 @@ def create_admins(count):
         a.save()
         adminList.append(a)
     return adminList
+
 
 @transaction.atomic
 def create_groups(count):
@@ -74,6 +77,7 @@ def create_groups(count):
             yri += 1
     return groups
 
+
 @transaction.atomic
 def create_students(count, groups):
     studList = []
@@ -83,10 +87,12 @@ def create_students(count, groups):
             goodGroups = list(filter(lambda x: x.year == yr[1] and x.study_line == sl[1], groups))
             for i in range(count):
                 idn += 1
-                s = Student(id_number=idn, first_name=random.choice(firstNames), last_name=random.choice(lastNames), email="bla@bla.com", group=random.choice(goodGroups))
+                s = Student(id_number=idn, first_name=random.choice(firstNames), last_name=random.choice(lastNames),
+                            email="bla@bla.com", group=random.choice(goodGroups))
                 s.save()
                 studList.append(s)
     return studList
+
 
 @transaction.atomic
 def create_students_year(count, groups, year, stidx):
@@ -96,17 +102,19 @@ def create_students_year(count, groups, year, stidx):
         goodGroups = list(filter(lambda x: x.year == year and x.study_line == sl[1], groups))
         for i in range(count):
             idn += 1
-            s = Student(id_number=idn, first_name=random.choice(firstNames), last_name=random.choice(lastNames), email="bla@bla.com", group=random.choice(goodGroups))
+            s = Student(id_number=idn, first_name=random.choice(firstNames), last_name=random.choice(lastNames),
+                        email="bla@bla.com", group=random.choice(goodGroups))
             s.save()
             studList.append(s)
     return studList
+
 
 @transaction.atomic
 def create_dchiefs():
     dcfs = []
     for sl in StudyLine.CHOICES:
         dc = ChiefOfDepartment(department=sl[1], first_name=random.choice(firstNames),
-                           last_name=random.choice(lastNames), email="bla@bla.com")
+                               last_name=random.choice(lastNames), email="bla@bla.com")
         dc.save()
         dc.user.set_password("parolaparola")
         dc.user.save()
@@ -114,6 +122,7 @@ def create_dchiefs():
         dc.save()
         dcfs.append(dc)
     return dcfs
+
 
 @transaction.atomic
 def create_courses():
@@ -130,6 +139,8 @@ def create_courses():
                     courses.append(c)
                     idx += 1
     return courses
+
+
 @transaction.atomic
 def generate_grades(yearState):
     cs = Course.objects.filter(academic_year=yearState.year, semester=yearState.semester)
@@ -150,7 +161,9 @@ def generate_grades(yearState):
     for a in asgn:
         if a.course.semester == yearState.semester:
             grade = Grade(value=random.randint(2,10), student=a.student, course=a.course, second_date=random.choice([True, False]))
+            grade = Grade(value=random.randint(2, 10), student=a.student, course=a.course)
             grade.save()
+
 
 if __name__ == "__main__":
     firstNames = ["Emil", "Ion", "Cornel", "Maria", "Vasile", "Bogdan", "Ana", "Laura", "Melisa", "Sergiu", "Ionut"]
@@ -175,6 +188,17 @@ if __name__ == "__main__":
     groups = create_groups(4)
     print("Creating 50 students for each year/studyline")
     studList = create_students(50, groups)
+    s = studList[0]
+    s.user.set_password("parolaparola")
+    s.is_activated = True
+    s.save()
+    s.user.save()
+
+    t = teacherList[0]
+    t.user.set_password("parolaparola")
+    t.user.save()
+    t.is_activated = True
+    t.save()
     print("Creating courses for each studyline/year")
     courses = create_courses()
     print("Moving to start of first semester and generating grades...")
@@ -206,19 +230,6 @@ if __name__ == "__main__":
     yearState.save()
     generate_grades(yearState)
 
-    s = studList[0]
-    s.user.set_password("parolaparola")
-    s.is_activated = True
-    s.save()
-    s.user.save()
-
-    t = teacherList[0]
-    t.user.set_password("parolaparola")
-    t.user.save()
-    t.is_activated = True
-    t.save()
-
-
     with open("dbinfo.txt", "w") as f:
         f.write("Activated users with password parolaparola:\n")
         for a in adminList:
@@ -237,6 +248,5 @@ if __name__ == "__main__":
         for el in allStuds:
             f.write(el.user.username + "\t" + el.get_temp_pass() + " Group: " + str(el.group.number) + " Active: " + \
                     str(el.is_enrolled) + "\n")
-
 
     print("Done..")

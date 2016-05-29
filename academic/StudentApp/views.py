@@ -3,7 +3,7 @@ from statistics import mean
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
 from reportlab.pdfgen import canvas
@@ -11,8 +11,9 @@ from LoginApp.models import Student
 from LoginApp.user_checks import student_check, admin_check
 from StudentApp.admin import return_grade
 from StudentApp.forms import SelectOptionals, SelectInterval, YearSemesterDropDown
+from StudentApp.models import StudyGroup
 from TeacherApp.models import Grade, PackageToOptionals, OptionalCourse, StudentOptions, \
-    StudentAssignedCourses
+    StudentAssignedCourses, ExaminationPeriod
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
@@ -27,7 +28,7 @@ def main_page(request):
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(student_check, login_url=reverse_lazy('LoginApp:login'))
 def grades(request):
-    current_student = request.user.client_set.first()
+    current_student = Student.objects.get(user=request.user)
     form = YearSemesterDropDown()
     courses = []
     if request.POST:
@@ -40,19 +41,37 @@ def grades(request):
                                                              course__semester=semester)]
             for i in range(len(courses)):
                 if Grade.objects.filter(course=courses[i], student=current_student):
+                    difference = int(year) - current_student.group.year
+                    if difference > 0:
+                        difference = 0
                     grade = Grade.objects.get(course=courses[i], student=current_student)
-                    courses[i] = (courses[i], grade)
+                    date = get_object_or_404(ExaminationPeriod, course=courses[i],
+                                             group=StudyGroup.objects.get(
+                                                 number=current_student.group.number + 10 * difference)).exam_date
+                    if grade.second_date == 1:
+                        date = get_object_or_404(ExaminationPeriod, course=courses[i],
+                                                 group__student=current_student).reexam_date
+                    courses[i] = (courses[i], grade, date)
                 else:
-                    courses[i] = (courses[i], "None")
+                    courses[i] = (courses[i], "None", "Undefined")
     else:
         courses = [i.course for i in
                    StudentAssignedCourses.objects.filter(student=current_student, course__year=1, course__semester=1)]
         for i in range(len(courses)):
-            if Grade.objects.filter(course=courses[i],  student=current_student):
+            if Grade.objects.filter(course=courses[i], student=current_student):
+                difference = 1 - current_student.group.year
+                if difference > 0:
+                    difference = 0
                 grade = Grade.objects.get(course=courses[i], student=current_student)
-                courses[i] = (courses[i], grade)
+                date = get_object_or_404(ExaminationPeriod, course=courses[i],
+                                         group=StudyGroup.objects.get(
+                                             number=current_student.group.number + 10 * difference)).exam_date
+                if grade.second_date == 1:
+                    date = get_object_or_404(ExaminationPeriod, course=courses[i],
+                                             group__student=current_student).reexam_date
+                courses[i] = (courses[i], grade, date)
             else:
-                courses[i] = (courses[i], "None")
+                courses[i] = (courses[i], "None", "Undefined")
     return render(request, "StudentApp/grades.html", {"table": courses, "form": form, "has_permission": True})
 
 
@@ -108,15 +127,16 @@ def interval(request):
             for student in Student.objects.all():
                 courses = [i.course for i in StudentAssignedCourses.objects.filter(student=student)]
                 medie = mean([return_grade(course, student) for course in courses])
-                student_detail = [student.first_name, student.last_name, round(medie, 2),student.group.year,student.group.number]
+                student_detail = [student.first_name, student.last_name, round(medie, 2), student.group.year,
+                                  student.group.number]
                 l.append(student_detail)
-            year1 = [i for i in l if i[3]==1]
-            year2 =[i for i in l if i[3]==2]
-            year3=[i for i in l if i[3]==3]
+            year1 = [i for i in l if i[3] == 1]
+            year2 = [i for i in l if i[3] == 2]
+            year3 = [i for i in l if i[3] == 3]
             ordonata1 = sorted(year1, key=lambda x: x[2], reverse=True)
             ordonata2 = sorted(year2, key=lambda x: x[2], reverse=True)
             ordonata3 = sorted(year3, key=lambda x: x[2], reverse=True)
-            ordonata=[ordonata1,ordonata2,ordonata3]
+            ordonata = [ordonata1, ordonata2, ordonata3]
             p.setFont("Times-Roman", 15)
 
             for ord in ordonata:
@@ -130,7 +150,7 @@ def interval(request):
                         p.setFont("Times-Roman", 12)
                         p.drawString(80, xx, student[1] + " " + student[0])
                         p.drawString(300, xx, str(student[2]))
-                        p.drawString(450,xx,str(student[4]))
+                        p.drawString(450, xx, str(student[4]))
                         c += 1
                         if c > 15:
                             p.showPage()
@@ -138,7 +158,7 @@ def interval(request):
                             xx = 700
                         xx -= 30
                 xx -= 20
-                xx=765
+                xx = 765
                 p.showPage()
             p.save()
             return response

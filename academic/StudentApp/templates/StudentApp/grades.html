@@ -19,7 +19,7 @@
             <th>Grade</th>
             <th>Period</th>
         </tr>
-        {% for course, grade in table %}
+        {% for course, grade, date in table %}
             <tr>
                 <td>{{ course.name }}</td>
                 <td>{{ course.teacher }}</td>
@@ -34,14 +34,9 @@
                 {% else %}
                     <td>
                         {{ grade.value }}
-
                     </td>
                     <td>
-                        {% if not grade.second_date %}
-                            Examination
-                        {% else %}
-                            Reexamination
-                        {% endif %}
+                        {{ date }}
                     </td>
                 {% endif %}
             </tr>
