@@ -221,7 +221,7 @@ if __name__ == "__main__":
     with open("dbinfo.txt", "w") as f:
         f.write("Activated users with password parolaparola:\n")
         for a in adminList:
-            f.write("Admin: " + a.user.username + "\n")
+            f.write("Staff: " + a.user.username + "\n")
         f.write("Student: " + studList[0].user.username + "\n")
         f.write("Teacher: " + teacherList[0].user.username + "\n")
         for dc in dch:
