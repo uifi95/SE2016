@@ -279,7 +279,7 @@ class CurrentYearState(models.Model):
                     if grade >= 5:
                         creditCount += el.course.number_credits
 
-                if creditCount > 30:
+                if creditCount >= 30:
                     if st.group.year == Year.CHOICES[-1][0]:
                         # student graduates
                         st.is_enrolled = False
