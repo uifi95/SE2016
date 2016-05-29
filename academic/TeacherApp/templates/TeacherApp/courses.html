@@ -9,12 +9,14 @@
     {% for line, years in study_lines %}
         <h1>{{ line }}</h1>
         {% for year in years %}
-            <h2>Study Year {{year}}</h2>
+            <h2>Study Year {{ year }}</h2>
             <table>
                 {% for course in courses %}
-                    {% if course.study_line == line and course.year == year%}
+                    {% if course.study_line == line and course.year == year %}
                         <tr>
-                            <td><a href="{% url 'TeacherApp:students' course.id 0 %}">{{ course.name }}</a></td>
+                            <td>
+                                <a href="{% url 'TeacherApp:students' course_id=course.id group_number=0 period=0%}">{{ course.name }}</a>
+                            </td>
                         </tr>
                     {% endif %}
                 {% endfor %}

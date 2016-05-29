@@ -160,7 +160,7 @@ def courses(request):
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
-def students(request, course_id, group_number=0):
+def students(request, course_id, group_number=0, period=0):
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('group', 'first_name', 'last_name')
     groups = [(0, "All Groups")] + [(i.number, i.number) for i in
@@ -169,7 +169,6 @@ def students(request, course_id, group_number=0):
     if int(group_number) != 0:
         all_students = StudentAssignedCourses.objects.filter(course=course, student__group__number=group_number)
     else:
-        print(course)
         all_students = StudentAssignedCourses.objects.filter(course=course)
     all_students = Student.objects.filter(id_number__in=all_students.values('student__id_number')).order_by(*args)
     args = ('student__' + i for i in args)
@@ -182,26 +181,29 @@ def students(request, course_id, group_number=0):
         count += 1
     if request.POST:
         if group_number == 0:
-            form = GroupDropDownForm(options=groups, data=request.POST)
+            form = GroupDropDownForm(options=groups, xsel=period, data=request.POST)
         else:
-            form = GroupDropDownForm(options=groups, selected=group_number, data=request.POST)
+            form = GroupDropDownForm(options=groups, selected=group_number, xsel=period, data=request.POST)
         if form.is_valid():
             group_number = form.cleaned_data['group']
-            return redirect("TeacherApp:students", course_id=course_id, group_number=group_number)
+            period = form.cleaned_data['reexam']
+            print(period)
+            return redirect("TeacherApp:students", course_id=course_id, group_number=group_number, period=period)
     else:
         if group_number == 0:
-            form = GroupDropDownForm(options=groups)
+            form = GroupDropDownForm(options=groups, xsel=period)
         else:
-            form = GroupDropDownForm(options=groups, selected=group_number)
+            form = GroupDropDownForm(options=groups, selected=group_number, xsel=period)
         return render(request, "TeacherApp/students.html",
                       {"students": zip(all_students, grades), 'course_id': course_id, 'group_number': group_number,
+                       'period': period,
                        'form': form,
                        "has_permission": True})
 
 
 @login_required(login_url=reverse_lazy('LoginApp:login'))
 @user_passes_test(teacher_check, login_url=reverse_lazy('LoginApp:login'))
-def edit(request, course_id, student_id, group_number):
+def edit(request, course_id, student_id, group_number, period):
     form = GradeForm()
     course = get_object_or_404(Course, pk=int(course_id))
     args = ('group', 'first_name', 'last_name')
@@ -228,20 +230,21 @@ def edit(request, course_id, student_id, group_number):
             course = get_object_or_404(Course, pk=int(course_id))
             grade_exists = Grade.objects.filter(student=student, course=course).exists()
             if not grade_exists:
-                grade = Grade(value=value, student=student, course=course)
+                grade = Grade(value=value, student=student, course=course, second_date=bool(period))
             else:
                 grade = Grade.objects.filter(student=student, course=course).first()
                 grade.value = value
+                grade.second_date = bool(period)
             grade.save()
-            return redirect('TeacherApp:students', course_id=course_id, group_number=group_number)
+            return redirect('TeacherApp:students', course_id=course_id, group_number=group_number, period = period)
         else:
             return render(request, "TeacherApp/edit.html",
                           {"students": zip(all_students, grades), 'form': form, "student_id": int(student_id),
-                           "course_id": course_id, "group_number": group_number,
+                           "course_id": course_id, "group_number": group_number, 'period': period,
                            "has_permission": True})
     return render(request, "TeacherApp/edit.html",
                   {"students": zip(all_students, grades), 'form': form, "student_id": int(student_id),
-                   "course_id": course_id, "group_number": group_number,
+                   "course_id": course_id, "group_number": group_number, 'period': period,
                    "has_permission": True})
 
 
@@ -275,9 +278,6 @@ def view_all_courses(request):
 
     else:
         form = TeacherDropDownForm(options=teachers)
-
-        course_list = Course.objects.filter(study_line=department, academic_year=crtYear,
-                                            semester=crtSemester).order_by("teacher")
         return render(request, "TeacherApp/view_courses.html",
                       {"courses": all_courses, 'form': form, "has_permission": True})
 

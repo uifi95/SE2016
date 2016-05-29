@@ -6,8 +6,9 @@ app_name = "TeacherApp"
 urlpatterns = [
     url(r'^$', views.teacher_main, name='main'),
     url(r'^courses/$', views.courses, name='courses'),
-    url(r'^courses/(?P<course_id>\d+)&(?P<group_number>\d+)/$', views.students, name='students'),
-    url(r'^courses/(?P<course_id>\d+)&(?P<group_number>\d+)/(?P<student_id>\d+)/$', views.edit, name='edit'),
+    url(r'^courses/(?P<course_id>\d+)&(?P<group_number>\d+)&(?P<period>\d+)/$', views.students, name='students'),
+    url(r'^courses/(?P<course_id>\d+)&(?P<group_number>\d+)&(?P<period>\d+)/(?P<student_id>\d+)/$', views.edit,
+        name='edit'),
     url(r'^optionals/$', views.optionals, name='optionals'),
     url(r'^optionals/add/$', views.add_optional, name='add_opt'),
     url(r'^view_packages/$', views.view_all_packages, name='view_all_packages'),

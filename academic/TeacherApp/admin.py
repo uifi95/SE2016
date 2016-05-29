@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from TeacherApp.models import Course, Grade, OptionalCourse, OptionalPackage, StudentAssignedCourses
+from TeacherApp.models import Course, Grade, OptionalCourse, OptionalPackage, StudentAssignedCourses, ExaminationPeriod
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -26,14 +26,20 @@ class OptionalPackageAdmin(admin.ModelAdmin):
     fields = ['name', 'year', 'department']
     list_display = ['name', 'year', 'academic_year', 'department']
 
-class AssignedCouresAdmin(admin.ModelAdmin):
+
+class AssignedCoursesAdmin(admin.ModelAdmin):
     fields = ['student', 'course', 'year']
     list_display = ['student', 'course', 'year']
 
+
+class ExaminationPeriodsAdmin(admin.ModelAdmin):
+    fields = ['exam_date', 'reexam_date', 'group', 'course']
+    list_display = ['exam_date', 'reexam_date', 'group', 'course']
 
 admin.site.register(Course, CourseAdmin)
 admin.site.register(OptionalCourse, OptionalCourseAdmin)
 admin.site.register(Grade, GradeAdmin)
 # Not sure admin should see optional packages, at least not in this form
 admin.site.register(OptionalPackage, OptionalPackageAdmin)
-admin.site.register(StudentAssignedCourses, AssignedCouresAdmin)
+admin.site.register(StudentAssignedCourses, AssignedCoursesAdmin)
+admin.site.register(ExaminationPeriod, ExaminationPeriodsAdmin)

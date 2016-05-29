@@ -29,6 +29,7 @@ def main_page(request):
 def grades(request):
     current_student = request.user.client_set.first()
     form = YearSemesterDropDown()
+    courses = []
     if request.POST:
         form = YearSemesterDropDown(data=request.POST)
         if form.is_valid():
@@ -38,8 +39,8 @@ def grades(request):
                        StudentAssignedCourses.objects.filter(student=current_student, course__year=year,
                                                              course__semester=semester)]
             for i in range(len(courses)):
-                if Grade.objects.filter(course=courses[i]):
-                    grade = Grade.objects.get(course=courses[i]).value
+                if Grade.objects.filter(course=courses[i], student=current_student):
+                    grade = Grade.objects.get(course=courses[i], student=current_student)
                     courses[i] = (courses[i], grade)
                 else:
                     courses[i] = (courses[i], "None")
@@ -47,8 +48,8 @@ def grades(request):
         courses = [i.course for i in
                    StudentAssignedCourses.objects.filter(student=current_student, course__year=1, course__semester=1)]
         for i in range(len(courses)):
-            if Grade.objects.filter(course=courses[i]):
-                grade = Grade.objects.get(course=courses[i]).value
+            if Grade.objects.filter(course=courses[i],  student=current_student):
+                grade = Grade.objects.get(course=courses[i], student=current_student)
                 courses[i] = (courses[i], grade)
             else:
                 courses[i] = (courses[i], "None")

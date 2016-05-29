@@ -17,13 +17,33 @@
             <th>Teacher</th>
             <th>Nr. of Credits</th>
             <th>Grade</th>
+            <th>Period</th>
         </tr>
         {% for course, grade in table %}
             <tr>
                 <td>{{ course.name }}</td>
                 <td>{{ course.teacher }}</td>
                 <td>{{ course.number_credits }}</td>
-                <td>{{ grade }}</td>
+                {% if grade == "None" %}
+                    <td>
+                        None
+                    </td>
+                    <td>
+                        Undefined
+                    </td>
+                {% else %}
+                    <td>
+                        {{ grade.value }}
+
+                    </td>
+                    <td>
+                        {% if not grade.second_date %}
+                            Examination
+                        {% else %}
+                            Reexamination
+                        {% endif %}
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table>

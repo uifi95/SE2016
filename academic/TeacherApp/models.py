@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 from LoginApp.models import Teacher, Student, StudyLine, CurrentYearState
-from StudentApp.models import Year
+from StudentApp.models import Year, StudyGroup
 
 
 class Course(models.Model):
@@ -36,6 +36,7 @@ class Grade(models.Model):
     value = models.IntegerField(unique=False, default=0, null=True)
     student = models.ForeignKey(Student, null=False)
     course = models.ForeignKey(Course, null=False)
+    second_date = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.value) + " " + str(self.course)
@@ -70,3 +71,13 @@ class StudentAssignedCourses(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     year = models.IntegerField("Academic year")
+
+
+class ExaminationPeriod(models.Model):
+    exam_date = models.DateField("Examination Date")
+    reexam_date = models.DateField("Reexamination Date")
+    group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.group) + " " + str(self.course)

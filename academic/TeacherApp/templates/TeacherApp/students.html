@@ -8,7 +8,7 @@
 {% block content %}
     <form action="{{ app_path }}" method="post" id="grade-form">{% csrf_token %}
         <div class="form-row" align="center">
-            {{ form.group.label_tag }} {{ form.group }}
+            {{ form.group.label_tag }} {{ form.group }} &emsp; {{ form.reexam.label_tag }} {{ form.reexam }}
         </div>
     </form>
     <h1 id="studtbl">Students</h1>
@@ -24,7 +24,7 @@
                 <td id="centru">{{ student.id_number }}</td>
                 <td id="centru"> {{ grade }}</td>
                 <td>
-                    <a href="{% url 'TeacherApp:edit' course_id=course_id student_id=student.id group_number=group_number %}">
+                    <a href="{% url 'TeacherApp:edit' course_id=course_id student_id=student.id group_number=group_number period=period %}">
                         <button class="buton">Edit Grade</button>
                     </a></td>
             </tr>
